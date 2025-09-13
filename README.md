@@ -19,21 +19,12 @@ Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
 
 Revisar la documentación en [`./docs`](./docs)
 
-### Requerimientos
-
-TODO: Corregir la lista de requerimientos:
-- **R1**: El sistema debe ...
-- **R2**: El sistema debe ...
-<br>...<br>
-- **Rn**: El sistema debe ...
-- **Rm**: El sistema debe ...
+- [Requerimientos](./docs/requerimientos.md)
+- [SRS: Software Requirements Specification](./docs/srs.md)
 
 ### Diseño
 
-TODO: Crear el diagrama de clases:
-
-![Diagrama de Clases](./docs/diagramas.png)
-
+![Diagrama de Clases](./docs/diagramas.md)
 
 ### Tárifas
 

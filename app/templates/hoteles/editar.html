@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Hotel</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ hotel.nombre }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="direccion" class="form-label">Dirección</label>
+            <input type="text" name="direccion" id="direccion" class="form-control" value="{{ hotel.direccion }}">
+        </div>
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control" value="{{ hotel.telefono }}">
+        </div>
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo</label>
+            <input type="email" name="correo" id="correo" class="form-control" value="{{ hotel.correo }}">
+        </div>
+        <div class="mb-3">
+            <label for="ubicacion_geografica" class="form-label">Ubicación Geográfica</label>
+            <input type="text" name="ubicacion_geografica" id="ubicacion_geografica" class="form-control" value="{{ hotel.ubicacion_geografica }}">
+        </div>
+        <div class="mb-3">
+            <label for="descripcion_servicios" class="form-label">Descripción de Servicios</label>
+            <textarea name="descripcion_servicios" id="descripcion_servicios" class="form-control">{{ hotel.descripcion_servicios }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select name="estado" id="estado" class="form-select" required>
+                {% for estado in estados %}
+                    <option value="{{ estado.value }}" {% if hotel.estado.value == estado.value %}selected{% endif %}>{{ estado.value|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+    <a href="{{ url_for('hoteles.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock %}

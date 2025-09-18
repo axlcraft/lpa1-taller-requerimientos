@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle del Hotel</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ hotel.nombre }}</h5>
+            <p class="card-text">Ubicación: {{ hotel.ubicacion }}</p>
+            <p class="card-text">Descripción: {{ hotel.descripcion }}</p>
+            <p class="card-text">Estado: {{ hotel.estado }}</p>
+        </div>
+    </div>
+    <a href="{{ url_for('hoteles.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock %}

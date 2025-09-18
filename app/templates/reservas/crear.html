@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Nueva Reserva</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="habitacion_id" class="form-label">Habitación</label>
+            <select name="habitacion_id" id="habitacion_id" class="form-select" required>
+                {% for habitacion in habitaciones %}
+                    <option value="{{ habitacion.id }}">{{ habitacion.hotel.nombre }} - {{ habitacion.tipo.value|capitalize }} ({{ habitacion.descripcion }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="cliente_id" class="form-label">Cliente</label>
+            <select name="cliente_id" id="cliente_id" class="form-select" required>
+                {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nombre_completo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha de entrada</label>
+            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_fin" class="form-label">Fecha de salida</label>
+            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="cantidad_personas" class="form-label">Cantidad de personas</label>
+            <input type="number" name="cantidad_personas" id="cantidad_personas" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="tipo_pago" class="form-label">Tipo de pago</label>
+            <select name="tipo_pago" id="tipo_pago" class="form-select">
+                {% for tipo in tipos_pago %}
+                    <option value="{{ tipo.value }}">{{ tipo.value|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Reserva</button>
+    </form>
+</div>
+{% endblock %}

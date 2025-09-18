@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Listado de Habitaciones</h2>
+    <a href="{{ url_for('habitaciones.crear') }}" class="btn btn-primary mb-3">Nueva Habitación</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hotel</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Precio Base</th>
+                <th>Capacidad</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for habitacion in habitaciones %}
+            <tr>
+                <td>{{ habitacion.id }}</td>
+                <td>{{ habitacion.hotel.nombre }}</td>
+                <td>{{ habitacion.tipo.value }}</td>
+                <td>{{ habitacion.descripcion }}</td>
+                <td>{{ habitacion.precio_base }}</td>
+                <td>{{ habitacion.capacidad }}</td>
+                <td>{{ habitacion.estado.value }}</td>
+                <td>
+                    <a href="{{ url_for('reservas.crear', habitacion_id=habitacion.id) }}" class="btn btn-sm btn-primary">Reservar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

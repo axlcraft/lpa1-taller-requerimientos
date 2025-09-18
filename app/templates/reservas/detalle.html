@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle de Reserva</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Reserva #{{ reserva.id }}</h5>
+            <p class="card-text">Cliente: {{ reserva.cliente.nombre_completo }}</p>
+            <p class="card-text">Habitación: {{ reserva.habitacion.hotel.nombre }} - {{ reserva.habitacion.tipo.value|capitalize }}</p>
+            <p class="card-text">Fecha de entrada: {{ reserva.fecha_inicio }}</p>
+            <p class="card-text">Fecha de salida: {{ reserva.fecha_fin }}</p>
+            <p class="card-text">Cantidad de personas: {{ reserva.cantidad_personas }}</p>
+            <p class="card-text">Total: ${{ reserva.total }}</p>
+            <p class="card-text">Estado: {{ reserva.estado.value|capitalize }}</p>
+        </div>
+    </div>
+    <a href="{{ url_for('reservas.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock %}

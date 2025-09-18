@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Hoteles - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-building me-2"></i>Gestión de Hoteles</h1>
+    <a href="{{ url_for('hoteles.crear') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nuevo Hotel
+    </a>
+</div>
+
+{% if hoteles %}
+<div class="row">
+    {% for hotel in hoteles %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ hotel.nombre }}</h5>
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ hotel.ubicacion_geografica or 'No especificado' }}
+                    </small>
+                </p>
+                {% if hotel.direccion %}
+                <p class="card-text">
+                    <i class="fas fa-home me-1"></i>{{ hotel.direccion }}
+                </p>
+                {% endif %}
+                
+                <p class="card-text">{{ hotel.descripcion_servicios[:100] if hotel.descripcion_servicios }}{% if hotel.descripcion_servicios and hotel.descripcion_servicios|length > 100 %}...{% endif %}</p>
+                
+                <div class="row text-center mb-3">
+                    <div class="col">
+                        <span class="badge bg-{{ 'success' if hotel.estado.value == 'activo' else 'secondary' }} fs-6">
+                            {{ hotel.estado.value.title() }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Habitaciones</small>
+                        <br>
+                        <strong>{{ hotel.habitaciones|length }}</strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Promociones</small>
+                        <br>
+                        <strong>{{ hotel.promociones|length }}</strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Fotos</small>
+                        <br>
+                        <strong>{{ hotel.fotos|length }}</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="{{ url_for('hoteles.detalle', hotel_id=hotel.id) }}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye me-1"></i>Ver
+                        </a>
+                        <a href="{{ url_for('hoteles.editar', hotel_id=hotel.id) }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </a>
+                    </div>
+                    <form method="POST" action="{{ url_for('hoteles.eliminar', hotel_id=hotel.id) }}" class="d-inline" 
+                          onsubmit="return confirm('¿Está seguro de eliminar este hotel?')">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash me-1"></i>Eliminar
+                        </button>
+                    </form>
+                </div>
+                
+                {% if hotel.correo or hotel.telefono %}
+                <div class="mt-2">
+                    {% if hotel.correo %}
+                    <small class="text-muted d-block">
+                        <i class="fas fa-envelope me-1"></i>{{ hotel.correo }}
+                    </small>
+                    {% endif %}
+                    {% if hotel.telefono %}
+                    <small class="text-muted d-block">
+                        <i class="fas fa-phone me-1"></i>{{ hotel.telefono }}
+                    </small>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-building fa-4x text-muted mb-3"></i>
+    <h3 class="text-muted">No hay hoteles registrados</h3>
+    <p class="text-muted">Comience agregando su primer hotel al sistema</p>
+    <a href="{{ url_for('hoteles.crear') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Crear Primer Hotel
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle de Habitación</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Habitación #{{ habitacion.id }}</h5>
+            <p class="card-text">Hotel: {{ habitacion.hotel.nombre }}</p>
+            <p class="card-text">Tipo: {{ habitacion.tipo.value|capitalize }}</p>
+            <p class="card-text">Descripción: {{ habitacion.descripcion }}</p>
+            <p class="card-text">Precio Base: ${{ habitacion.precio_base }}</p>
+            <p class="card-text">Capacidad: {{ habitacion.capacidad }}</p>
+            <p class="card-text">Estado: {{ habitacion.estado.value|capitalize }}</p>
+        </div>
+    </div>
+    <a href="{{ url_for('habitaciones.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock %}

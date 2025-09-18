@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Buscar Habitaciones - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-search me-2"></i>Búsqueda de Habitaciones</h1>
+
+<!-- Formulario de Búsqueda -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                           value="{{ fecha_inicio or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" 
+                           value="{{ fecha_fin or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="ubicacion" class="form-label">Ubicación</label>
+                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" 
+                           value="{{ ubicacion or '' }}" placeholder="Ciudad, hotel...">
+                </div>
+                <div class="col-md-3">
+                    <label for="precio_max" class="form-label">Precio Máximo</label>
+                    <input type="number" class="form-control" id="precio_max" name="precio_max" 
+                           value="{{ precio_max or '' }}" step="0.01" placeholder="0.00">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Buscar
+                    </button>
+                    <a href="{{ url_for('main.buscar') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-eraser me-2"></i>Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Resultados -->
+{% if habitaciones %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Resultados de Búsqueda</h3>
+    <span class="badge bg-primary fs-6">{{ habitaciones|length }} habitación(es) encontrada(s)</span>
+</div>
+
+<div class="row">
+    {% for habitacion in habitaciones %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-bed me-2"></i>{{ habitacion.tipo.value.title() }}
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    {{ habitacion.hotel.nombre }}
+                </h6>
+                
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ habitacion.hotel.ubicacion_geografica or 'No especificado' }}
+                    </small>
+                </p>
+                
+                {% if habitacion.descripcion %}
+                <p class="card-text">{{ habitacion.descripcion[:100] }}{% if habitacion.descripcion|length > 100 %}...{% endif %}</p>
+                {% endif %}
+                
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Capacidad</small>
+                        <br>
+                        <strong><i class="fas fa-users me-1"></i>{{ habitacion.capacidad }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Precio/Noche</small>
+                        <br>
+                        <strong class="text-success">${{ habitacion.precio_base }}</strong>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-{{ 'success' if habitacion.estado.value == 'activa' else 'secondary' }}">
+                        {{ habitacion.estado.value.title() }}
+                    </span>
+                    <span class="badge bg-{{ 'success' if habitacion.hotel.estado.value == 'activo' else 'secondary' }}">
+                        Hotel {{ habitacion.hotel.estado.value.title() }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('main.detalle_habitacion', habitacion_id=habitacion.id) }}" 
+                       class="btn btn-info btn-sm">
+                        <i class="fas fa-eye me-1"></i>Ver Detalles
+                    </a>
+                    {% if habitacion.estado.value == 'activa' and habitacion.hotel.estado.value == 'activo' %}
+                    <a href="{{ url_for('reservas.crear', habitacion_id=habitacion.id) }}" 
+                       class="btn btn-success btn-sm">
+                        <i class="fas fa-calendar-plus me-1"></i>Reservar
+                    </a>
+                    {% else %}
+                    <span class="btn btn-secondary btn-sm disabled">
+                        <i class="fas fa-ban me-1"></i>No Disponible
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+    {% if request.args %}
+    <h3 class="text-muted">No se encontraron habitaciones</h3>
+    <p class="text-muted">Intente modificar los criterios de búsqueda</p>
+    {% else %}
+    <h3 class="text-muted">Realice una búsqueda</h3>
+    <p class="text-muted">Use los filtros para encontrar la habitación perfecta</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Establecer fecha mínima como hoy
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha_inicio').setAttribute('min', today);
+    document.getElementById('fecha_fin').setAttribute('min', today);
+    
+    // Cuando cambie fecha_inicio, actualizar min de fecha_fin
+    document.getElementById('fecha_inicio').addEventListener('change', function() {
+        const fechaInicio = this.value;
+        document.getElementById('fecha_fin').setAttribute('min', fechaInicio);
+    });
+});
+</script>
+{% endblock %}

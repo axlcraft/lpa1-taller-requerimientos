@@ -67,7 +67,7 @@ Siga estos pasos para configurar y ejecutar el sistema de reservas hoteleras en 
 
 1. **Clonar el proyecto**
 ```bash
-git clone https://github.com/UR-CC/lpa1-taller-requerimientos.git
+git clone https://github.com/axlcraft/lpa1-taller-requerimientos.git
 cd lpa1-taller-requerimientos
 ```
 
@@ -90,7 +90,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. **Configurar variables de entorno (opcional)**
+4. **Inicializar la base de datos**
+```bash
+# Crear base de datos con datos de ejemplo
+python init_db.py --with-sample-data
+```
+
+5. **Configurar variables de entorno (opcional)**
 ```bash
 # Para configuraciones personalizadas
 set DATABASE_URL=sqlite:///hotel_reservas.db

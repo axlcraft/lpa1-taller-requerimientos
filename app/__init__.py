@@ -1,12 +1,16 @@
 # app/__init__.py
 from flask import Flask
 from app.extensions import db
-from app.config import Config
+from app.config import config
+import os
 
-def create_app():
+def create_app(config_name=None):
     """Factory function para crear la aplicación Flask."""
+    if config_name is None:
+        config_name = os.environ.get('FLASK_ENV', 'development')
+    
     flask_app = Flask(__name__)
-    flask_app.config.from_object(Config)
+    flask_app.config.from_object(config.get(config_name, config['default']))
 
     # Inicializar extensiones
     db.init_app(flask_app)

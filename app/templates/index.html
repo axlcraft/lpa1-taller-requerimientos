@@ -35,9 +35,39 @@
                             <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
                         </div>
                         <div class="col-md-3">
-                            <label for="ubicacion" class="form-label">Ubicación</label>
-                            <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ciudad, hotel, dirección...">
+                            <label for="ciudad" class="form-label">Ciudad</label>
+                            <select name="ciudad" id="ciudad" class="form-select" onchange="actualizarHoteles();">
+                                <option value="">Todas las ciudades</option>
+                                {% for c in ciudades %}
+                                    <option value="{{ c }}">{{ c }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
+                        <div class="col-md-3">
+                            <label for="ubicacion" class="form-label">Hotel</label>
+                            <select name="ubicacion" id="ubicacion" class="form-select">
+                                <option value="">Todos los hoteles</option>
+                            </select>
+                        </div>
+                    </div>
+                    <script>
+                        const hotelesPorCiudad = JSON.parse('{{ hoteles_por_ciudad|tojson|safe }}');
+                        function actualizarHoteles() {
+                            const ciudad = document.getElementById('ciudad').value;
+                            const ubicacionSelect = document.getElementById('ubicacion');
+                            ubicacionSelect.innerHTML = '<option value="">Todos los hoteles</option>';
+                            if (ciudad && hotelesPorCiudad[ciudad]) {
+                                hotelesPorCiudad[ciudad].forEach(function(hotel) {
+                                    const opt = document.createElement('option');
+                                    opt.value = hotel.nombre;
+                                    opt.textContent = hotel.nombre;
+                                    ubicacionSelect.appendChild(opt);
+                                });
+                            }
+                        }
+                        document.getElementById('ciudad').addEventListener('change', actualizarHoteles);
+                        window.addEventListener('DOMContentLoaded', actualizarHoteles);
+                    </script>
                         <div class="col-md-3">
                             <label for="precio_max" class="form-label">Precio Máximo</label>
                             <input type="number" class="form-control" id="precio_max" name="precio_max" placeholder="0.00" step="0.01">

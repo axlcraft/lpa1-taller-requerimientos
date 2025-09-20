@@ -54,6 +54,12 @@ def create_app(config_name=None):
         print(f"Warning: Could not import reservas blueprint: {e}")
 
     try:
+        from app.routes.pagos import pagos_bp
+        flask_app.register_blueprint(pagos_bp, url_prefix='/pagos')
+    except ImportError as e:
+        print(f"Warning: Could not import pagos blueprint: {e}")
+
+    try:
         from app.routes.evaluaciones import evaluaciones_bp
         flask_app.register_blueprint(evaluaciones_bp, url_prefix='/evaluaciones')
     except ImportError as e:

@@ -3,12 +3,31 @@
 {% block title %}Hoteles - {{ app_name }}{% endblock %}
 
 {% block content %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="fas fa-building me-2"></i>Gestión de Hoteles</h1>
     <a href="{{ url_for('hoteles.crear') }}" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Nuevo Hotel
     </a>
 </div>
+
+<form id="filtro-hoteles" method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <select name="ciudad" class="form-select" onchange="document.getElementById('filtro-hoteles').submit();">
+            <option value="">Todas las ciudades</option>
+            {% for c in ciudades %}
+                <option value="{{ c }}" {% if ciudad_sel == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select name="estado" class="form-select" onchange="document.getElementById('filtro-hoteles').submit();">
+            <option value="">Todos los estados</option>
+            <option value="activo" {% if estado_sel == 'activo' %}selected{% endif %}>Activo</option>
+            <option value="inactivo" {% if estado_sel == 'inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+    </div>
+</form>
 
 {% if hoteles %}
 <div class="row">

@@ -31,6 +31,9 @@ class TipoHabitacion(Enum):
     SIMPLE = "simple"
     DOBLE = "doble"
     SUITE = "suite"
+    SILVER = "silver"
+    GOLD = "gold"
+    PLATINUM = "platinum"
     OTRO = "otro"
 
 class TipoTemporada(Enum):

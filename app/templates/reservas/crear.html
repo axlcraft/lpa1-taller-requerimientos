@@ -14,6 +14,7 @@
         <div class="mb-3">
             <label for="cliente_id" class="form-label">Cliente</label>
             <select name="cliente_id" id="cliente_id" class="form-select" required>
+                <option value="no_registrado">No registrado</option>
                 {% for cliente in clientes %}
                     <option value="{{ cliente.id }}">{{ cliente.nombre_completo }}</option>
                 {% endfor %}

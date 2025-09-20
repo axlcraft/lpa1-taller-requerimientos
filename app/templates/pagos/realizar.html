@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Realizar Pago{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 400px;">
+        <div class="card-body">
+            <h3 class="mb-4">Pago de Reserva</h3>
+            <p><strong>Monto:</strong> ${{ "%.2f"|format(transaccion.monto) }}</p>
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="banco" class="form-label">Banco</label>
+                    <select name="banco" id="banco" class="form-select" required>
+                        <option value="">Seleccione un banco</option>
+                        <option value="Bancolombia">Bancolombia (Colombia)</option>
+                        <option value="Davivienda">Davivienda (Colombia)</option>
+                        <option value="Banco de Chile">Banco de Chile (Chile)</option>
+                        <option value="Banco do Brasil">Banco do Brasil (Brasil)</option>
+                        <option value="Santander">Santander (España, Chile, México)</option>
+                        <option value="BBVA">BBVA (España, México, Perú, Argentina)</option>
+                        <option value="Scotiabank">Scotiabank (Canadá, México, Perú, Chile)</option>
+                        <option value="Bank of America">Bank of America (EE.UU.)</option>
+                        <option value="HSBC">HSBC (Reino Unido, México, Argentina)</option>
+                        <option value="Citi">Citi (EE.UU., México, Colombia)</option>
+                        <option value="Banco Nación">Banco Nación (Argentina)</option>
+                        <option value="Banco Panamá">Banco Panamá (Panamá)</option>
+                        <option value="Banco Popular">Banco Popular (Rep. Dominicana, Puerto Rico)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="numero_tarjeta" class="form-label">Número de Tarjeta</label>
+                    <input type="text" name="numero_tarjeta" id="numero_tarjeta" class="form-control" maxlength="16" pattern="\d{16}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+                    <input type="month" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cvv" class="form-label">CVV</label>
+                    <input type="text" name="cvv" id="cvv" class="form-control" maxlength="4" pattern="\d{3,4}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cuotas" class="form-label">Cuotas</label>
+                    <select name="cuotas" id="cuotas" class="form-select" required>
+                        <option value="1">1 cuota</option>
+                        <option value="3">3 cuotas</option>
+                        <option value="6">6 cuotas</option>
+                        <option value="12">12 cuotas</option>
+                        <option value="24">24 cuotas</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Confirmar Pago</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

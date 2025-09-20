@@ -11,6 +11,12 @@ body {
     color: #f5f5f5 !important;
     font-weight: 600;
 }
+}
+
+* {
+    /* color global eliminado para restaurar colores originales */
+}
+}
 .footer {
     background: linear-gradient(90deg, #232526 0%, #414345 100%);
     color: #e0e0e0;

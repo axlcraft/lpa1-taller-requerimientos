@@ -1,9 +1,7 @@
-<<<<<<< HEAD
-	Flask==2.3.3
-	Flask-SQLAlchemy==3.0.5
-	Werkzeug==2.3.7
-	rich==13.7.0
-=======
-rich
->>>>>>> 6133e37e51d481dc74f658a35f3760b2ca834164
+
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Werkzeug==2.3.7
+rich==13.7.0
+PyMySQL==1.1.2
 

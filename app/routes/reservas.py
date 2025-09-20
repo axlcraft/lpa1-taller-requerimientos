@@ -22,28 +22,32 @@ def crear():
     
     if request.method == 'POST':
         try:
+            if request.form['cliente_id'] == 'no_registrado':
+                flash('DEBES REGISTRARTE PARA PODER RESERVAR...', 'error')
+                return render_template('reservas/crear.html', habitaciones=habitaciones, clientes=clientes, tipos_pago=TipoPago)
+
             habitacion = Habitacion.query.get_or_404(request.form['habitacion_id'])
             fecha_inicio = datetime.strptime(request.form['fecha_inicio'], '%Y-%m-%d').date()
             fecha_fin = datetime.strptime(request.form['fecha_fin'], '%Y-%m-%d').date()
-            
+
             # Validaciones básicas
             if fecha_inicio >= fecha_fin:
                 flash('La fecha de fin debe ser posterior a la fecha de inicio', 'error')
                 return render_template('reservas/crear.html', habitaciones=habitaciones, clientes=clientes, tipos_pago=TipoPago)
-            
+
             if fecha_inicio < date.today():
                 flash('No se pueden hacer reservas para fechas pasadas', 'error')
                 return render_template('reservas/crear.html', habitaciones=habitaciones, clientes=clientes, tipos_pago=TipoPago)
-            
+
             cantidad_personas = int(request.form['cantidad_personas'])
             if cantidad_personas > habitacion.capacidad:
                 flash(f'La habitación solo tiene capacidad para {habitacion.capacidad} personas', 'error')
                 return render_template('reservas/crear.html', habitaciones=habitaciones, clientes=clientes, tipos_pago=TipoPago)
-            
+
             # Calcular total (precio base * días)
             dias = (fecha_fin - fecha_inicio).days
             total = float(habitacion.precio_base) * dias
-            
+
             # Crear la reserva
             reserva = Reserva(
                 fecha_inicio=fecha_inicio,
@@ -54,7 +58,7 @@ def crear():
                 cliente_id=request.form['cliente_id'],
                 habitacion_id=habitacion.id
             )
-            
+
             db.session.add(reserva)
             db.session.flush()  # Para obtener el ID
             

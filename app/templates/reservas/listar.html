@@ -36,7 +36,7 @@
                         <td>{{ reserva.fecha_inicio.strftime('%d/%m/%Y') }}</td>
                         <td>{{ reserva.fecha_fin.strftime('%d/%m/%Y') }}</td>
                         <td>
-                            <span class="badge {% if reserva.estado.value == 'confirmada' %}bg-success{% elif reserva.estado.value == 'pendiente' %}bg-warning{% else %}bg-danger{% endif %}">
+                            <span class="badge {% if reserva.estado.value == 'confirmada' %}bg-success text-dark{% elif reserva.estado.value == 'pendiente' %}bg-warning text-dark{% else %}bg-danger text-light{% endif %}">
                                 {{ reserva.estado.value|capitalize }}
                             </span>
                         </td>
@@ -44,6 +44,9 @@
                         <td>
                             <a href="{{ url_for('reservas.detalle', reserva_id=reserva.id) }}" class="btn btn-sm btn-info">Ver</a>
                             <a href="{{ url_for('reservas.editar', reserva_id=reserva.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                            {% if reserva.transaccion_pago and reserva.transaccion_pago.tipo.value == 'tarjeta' and reserva.transaccion_pago.estado.value == 'pendiente' %}
+                                <a href="{{ url_for('pagos.realizar', transaccion_id=reserva.transaccion_pago.id) }}" class="btn btn-sm btn-success">Realizar Pago</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

@@ -6,7 +6,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>#</th>
                 <th>Hotel</th>
                 <th>Tipo</th>
                 <th>Descripción</th>
@@ -18,7 +18,7 @@
         <tbody>
             {% for habitacion in habitaciones %}
             <tr>
-                <td>{{ habitacion.id }}</td>
+                <td>{{ loop.index }}</td>
                 <td>{{ habitacion.hotel.nombre }}</td>
                 <td>{{ habitacion.tipo.value }}</td>
                 <td>{{ habitacion.descripcion }}</td>

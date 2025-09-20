@@ -16,6 +16,12 @@ class TransaccionPago(BaseModel):
     fecha_pago = db.Column(db.DateTime, default=datetime.utcnow)
     estado = db.Column(db.Enum(EstadoPago), nullable=False, default=EstadoPago.PENDIENTE)
 
+    banco = db.Column(db.String(64))
+    numero_tarjeta = db.Column(db.String(20))
+    fecha_vencimiento = db.Column(db.String(7))  # formato MM/YYYY
+    cvv = db.Column(db.String(4))
+    cuotas = db.Column(db.Integer)
+
     reserva_id = db.Column(db.String(36), db.ForeignKey("reservas.id"))
     reserva = db.relationship("Reserva", back_populates="transaccion_pago")
 

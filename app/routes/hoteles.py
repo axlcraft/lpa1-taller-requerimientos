@@ -7,9 +7,19 @@ hoteles_bp = Blueprint('hoteles', __name__)
 
 @hoteles_bp.route('/')
 def listar():
-    """Lista todos los hoteles."""
-    hoteles = Hotel.query.all()
-    return render_template('hoteles/listar.html', hoteles=hoteles)
+    """Lista todos los hoteles con filtros por ciudad y estado."""
+    ciudad = request.args.get('ciudad')
+    estado = request.args.get('estado')
+    query = Hotel.query
+    if ciudad:
+        query = query.filter(Hotel.ubicacion_geografica == ciudad)
+    if estado:
+        query = query.filter(Hotel.estado == EstadoHotel[estado.upper()])
+    hoteles = query.all()
+
+    # Obtener lista de ciudades únicas
+    ciudades = [h.ubicacion_geografica for h in Hotel.query.distinct(Hotel.ubicacion_geografica).all()]
+    return render_template('hoteles/listar.html', hoteles=hoteles, ciudades=ciudades, ciudad_sel=ciudad, estado_sel=estado)
 
 @hoteles_bp.route('/crear', methods=['GET', 'POST'])
 def crear():

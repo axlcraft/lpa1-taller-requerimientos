@@ -21,16 +21,14 @@ class Config:
     TEMPLATES_AUTO_RELOAD = True
 
 class DevelopmentConfig(Config):
-    """Configuración para desarrollo con SQLite."""
+    """Configuración para desarrollo con MySQL."""
     DEBUG = True
-    
-    # Usar ruta absoluta para SQLite
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    instance_path = os.path.join(os.path.dirname(basedir), 'instance')
-    db_path = os.path.join(instance_path, 'hotel_reservas.db')
-    
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DEV_DATABASE_URL", 
-                                            f"sqlite:///{db_path}")
+    # Ejemplo de cadena de conexión MySQL:
+    # mysql+pymysql://usuario:contraseña@localhost/nombre_base
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DEV_DATABASE_URL",
+        "mysql+pymysql://hoteluser:hotelpass@localhost/hotel_reservas"
+    )
 
 class ProductionConfig(Config):
     """Configuración para producción."""

@@ -5,11 +5,72 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">{{ hotel.nombre }}</h5>
-            <p class="card-text">Ubicación: {{ hotel.ubicacion }}</p>
-            <p class="card-text">Descripción: {{ hotel.descripcion }}</p>
+            <p class="card-text">Ciudad: <strong>{{ hotel.ubicacion_geografica }}</strong></p>
+            <p class="card-text">Ubicación: {{ hotel.direccion }}</p>
+            <p class="card-text">Descripción: <strong>{{ hotel.descripcion_servicios }}</strong></p>
             <p class="card-text">Estado: {{ hotel.estado }}</p>
         </div>
     </div>
+    <h3 class="mt-4">Habitaciones Disponibles</h3>
+    {% if habitaciones %}
+        <table class="table table-bordered mt-2">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Precio Base</th>
+                    <th>Capacidad</th>
+                    <th>Reservar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for habitacion in habitaciones %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ habitacion.tipo.value }}</td>
+                    <td>{{ habitacion.descripcion }}</td>
+                    <td><span class="fw-bold text-success">${{ habitacion.precio_base }}</span></td>
+                    <td>{{ habitacion.capacidad }}</td>
+                    <td>
+                        <a href="{{ url_for('reservas.crear', habitacion_id=habitacion.id) }}" class="btn btn-sm btn-primary">Reservar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-2">No hay habitaciones disponibles en este hotel.</div>
+    {% endif %}
     <a href="{{ url_for('hoteles.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+    {% if session.get('is_superuser') %}
+    <a href="{{ url_for('hoteles.editar', hotel_id=hotel.id) }}" class="btn btn-warning mt-3 ms-2">Editar Hotel</a>
+    {% endif %}
+    <div class="mt-4">
+        <h4>Calificaciones</h4>
+        <p>Promedio del hotel: <strong>{{ '%.1f'|format(promedio_hotel) }}</strong> / 5</p>
+        <p>
+            {% for i in range(1,6) %}
+                {% if i <= promedio_hotel|round(0,'floor') %}
+                    <i class="fas fa-star text-warning"></i>
+                {% else %}
+                    <i class="far fa-star text-muted"></i>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% if calificaciones %}
+            {% set latest = calificaciones|sort(attribute='fecha', reverse=True) %}
+            <ul class="list-group">
+            {% for c in latest[:5] %}
+                <li class="list-group-item">
+                    <strong>{{ c.cliente.nombre_completo }}</strong> — Hotel: {{ c.estrellas_hotel }} · Habitación: {{ c.estrellas_habitacion }} · Atención: {{ c.estrellas_atencion }}
+                    <br><small class="text-muted">{{ c.fecha.strftime('%Y-%m-%d') }}</small>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Aún no hay calificaciones para este hotel.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

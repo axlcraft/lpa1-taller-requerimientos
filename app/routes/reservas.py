@@ -1,6 +1,6 @@
 
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models import Reserva, Cliente, Habitacion, EstadoReserva, TransaccionPago, TipoPago, EstadoPago, Hotel
 from app.extensions import db
 from datetime import datetime, date
@@ -18,13 +18,16 @@ def crear():
     """Crear una nueva reserva para una habitación."""
     from app.models.enums import EstadoHotel, EstadoHabitacion
     habitaciones = Habitacion.query.join(Habitacion.hotel).filter(Habitacion.estado==EstadoHabitacion.ACTIVA, Hotel.estado==EstadoHotel.ACTIVO).all()
-    clientes = Cliente.query.all()
+    # El cliente que crea la reserva debe ser el cliente autenticado en sesión
+    clientes = []
     
     if request.method == 'POST':
         try:
-            if request.form['cliente_id'] == 'no_registrado':
-                flash('DEBES REGISTRARTE PARA PODER RESERVAR...', 'error')
-                return render_template('reservas/crear.html', habitaciones=habitaciones, clientes=clientes, tipos_pago=TipoPago)
+            # Usar el cliente autenticado en sesión
+            cliente_id = session.get('cliente_id')
+            if not cliente_id:
+                flash('Debes iniciar sesión o registrarte para poder reservar.', 'error')
+                return redirect(url_for('auth.login_client'))
 
             habitacion = Habitacion.query.get_or_404(request.form['habitacion_id'])
             fecha_inicio = datetime.strptime(request.form['fecha_inicio'], '%Y-%m-%d').date()
@@ -46,7 +49,10 @@ def crear():
 
             # Calcular total (precio base * días)
             dias = (fecha_fin - fecha_inicio).days
-            total = float(habitacion.precio_base) * dias
+            cliente = Cliente.query.get(cliente_id)
+            descuento = cliente.descuento_reservas if cliente else 0.0
+            total_base = float(habitacion.precio_base) * dias
+            total = total_base * (1 - descuento)
 
             # Crear la reserva
             reserva = Reserva(
@@ -55,9 +61,16 @@ def crear():
                 cantidad_personas=cantidad_personas,
                 total=total,
                 estado=EstadoReserva.PENDIENTE,
-                cliente_id=request.form['cliente_id'],
+                cliente_id=cliente_id,
                 habitacion_id=habitacion.id
             )
+
+            # Aviso de descuento y cantidad de reservas
+            cantidad_reservas = len(cliente.reservas) + 1 if cliente else 1
+            if descuento > 0:
+                flash(f"¡Felicidades! Llevas {cantidad_reservas} reservas y tienes un descuento del {int(descuento*100)}% aplicado.", "success")
+            else:
+                flash(f"Llevas {cantidad_reservas} reservas. ¡Reserva 3 veces para obtener tu primer descuento!", "info")
 
             db.session.add(reserva)
             db.session.flush()  # Para obtener el ID
@@ -80,16 +93,23 @@ def crear():
             db.session.rollback()
             flash(f'Error al crear reserva: {str(e)}', 'error')
     
+    cliente = None
+    cliente_id = session.get('cliente_id')
+    if cliente_id:
+        cliente = Cliente.query.get(cliente_id)
+
     return render_template('reservas/crear.html', 
                          habitaciones=habitaciones,
-                         clientes=clientes,
-                         tipos_pago=TipoPago)
+                         tipos_pago=TipoPago,
+                         cliente=cliente)
 
-@reservas_bp.route('/<reserva_id>')
+@reservas_bp.route('/<reserva_id>', methods=['GET'])
 def detalle(reserva_id):
     """Detalle de una reserva específica."""
     reserva = Reserva.query.get_or_404(reserva_id)
-    return render_template('reservas/detalle.html', reserva=reserva)
+    # Todas las acciones de calificación deben realizarse desde el blueprint 'evaluaciones'
+    # Este endpoint muestra la reserva y un botón hacia la ruta de evaluación cuando aplique.
+    return render_template('reservas/detalle.html', reserva=reserva, current_date=date.today())
 
 
 
@@ -99,7 +119,7 @@ def editar(reserva_id):
     from app.models.enums import EstadoHotel, EstadoHabitacion
     reserva = Reserva.query.get_or_404(reserva_id)
     habitaciones = Habitacion.query.join(Habitacion.hotel).filter(Habitacion.estado==EstadoHabitacion.ACTIVA, Hotel.estado==EstadoHotel.ACTIVO).all()
-    clientes = Cliente.query.all()
+    clientes = []
     if request.method == 'POST':
         try:
             habitacion = Habitacion.query.get_or_404(request.form['habitacion_id'])
@@ -116,7 +136,8 @@ def editar(reserva_id):
                 flash(f'La habitación solo tiene capacidad para {habitacion.capacidad} personas', 'error')
                 return render_template('reservas/editar.html', reserva=reserva, habitaciones=habitaciones, clientes=clientes)
             reserva.habitacion_id = habitacion.id
-            reserva.cliente_id = request.form['cliente_id']
+            # No permitir cambiar el cliente desde el formulario; conservar cliente original
+            # (solo admins podrían cambiar propietario vía panel admin explícito)
             reserva.fecha_inicio = fecha_inicio
             reserva.fecha_fin = fecha_fin
             reserva.cantidad_personas = cantidad_personas

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Calificar Habitación</h2>
+    <div class="card p-3">
+        <div class="card-body">
+            <h5>{{ habitacion.hotel.nombre }} - {{ habitacion.tipo.value }}</h5>
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Cliente</label>
+                    <select name="cliente_id" class="form-select">
+                        {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nombre_completo }} ({{ c.correo }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Hotel</label>
+                    <div class="star-rating" id="hotel-stars">
+                        {% for i in range(1,6) %}
+                        <i class="fa-regular fa-star" data-value="{{ i }}"></i>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="estrellas_hotel" id="estrellas_hotel" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Habitación</label>
+                    <div class="star-rating" id="habitacion-stars">
+                        {% for i in range(1,6) %}
+                        <i class="fa-regular fa-star" data-value="{{ i }}"></i>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="estrellas_habitacion" id="estrellas_habitacion" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Atención</label>
+                    <div class="star-rating" id="atencion-stars">
+                        {% for i in range(1,6) %}
+                        <i class="fa-regular fa-star" data-value="{{ i }}"></i>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="estrellas_atencion" id="estrellas_atencion" required>
+                </div>
+
+                <button class="btn btn-primary">Enviar calificación</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .star-rating { font-size: 2rem; color: #ffd700; cursor: pointer; }
+    .star-rating .fa-star { transition: color 0.2s; }
+    .star-rating .fa-solid { color: #ffd700; }
+    .star-rating .fa-regular { color: #ccc; }
+</style>
+
+<script>
+function setupStarRating(containerId, inputId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const stars = container.querySelectorAll('i');
+    const input = document.getElementById(inputId);
+    let current = 0;
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const val = parseInt(this.dataset.value);
+            stars.forEach((s, idx) => {
+                s.classList.toggle('fa-solid', idx < val);
+                s.classList.toggle('fa-regular', idx >= val);
+            });
+        });
+        star.addEventListener('mouseout', function() {
+            stars.forEach((s, idx) => {
+                s.classList.toggle('fa-solid', idx < current);
+                s.classList.toggle('fa-regular', idx >= current);
+            });
+        });
+        star.addEventListener('click', function() {
+            current = parseInt(this.dataset.value);
+            input.value = current;
+            stars.forEach((s, idx) => {
+                s.classList.toggle('fa-solid', idx < current);
+                s.classList.toggle('fa-regular', idx >= current);
+            });
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    setupStarRating('hotel-stars','estrellas_hotel');
+    setupStarRating('habitacion-stars','estrellas_habitacion');
+    setupStarRating('atencion-stars','estrellas_atencion');
+});
+</script>
+{% endblock %}

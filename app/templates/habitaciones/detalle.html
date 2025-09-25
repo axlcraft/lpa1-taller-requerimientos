@@ -14,5 +14,31 @@
         </div>
     </div>
     <a href="{{ url_for('habitaciones.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+    <div class="mt-4">
+        <h4>Calificaciones</h4>
+        <p>Promedio de la habitación: <strong>{{ '%.1f'|format(calificacion_promedio) }}</strong> / 5</p>
+        <p>
+            {% for i in range(1,6) %}
+                {% if i <= calificacion_promedio|round(0,'floor') %}
+                    <i class="fas fa-star text-warning"></i>
+                {% else %}
+                    <i class="far fa-star text-muted"></i>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% if calificaciones %}
+            {% set latest = calificaciones|sort(attribute='fecha', reverse=True) %}
+            <ul class="list-group">
+            {% for c in latest[:5] %}
+                <li class="list-group-item">
+                    <strong>{{ c.cliente.nombre_completo }}</strong> — Habitación: {{ c.estrellas_habitacion }} · Atención: {{ c.estrellas_atencion }}
+                    <br><small class="text-muted">{{ c.fecha.strftime('%Y-%m-%d') }}</small>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Aún no hay calificaciones para esta habitación.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

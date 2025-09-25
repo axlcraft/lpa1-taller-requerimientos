@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models import Cliente
 from app.extensions import db
+from app.routes.auth import admin_required
 
 clientes_bp = Blueprint('clientes', __name__)
 
@@ -20,13 +21,20 @@ def registrar():
             if Cliente.query.filter_by(correo=request.form['correo']).first():
                 flash('Ya existe un cliente con ese correo electrónico', 'error')
                 return render_template('clientes/registrar.html')
+            # Validar que el username no exista
+            if Cliente.query.filter_by(username=request.form['username']).first():
+                flash('El nombre de usuario ya está en uso', 'error')
+                return render_template('clientes/registrar.html')
             
             cliente = Cliente(
                 nombre_completo=request.form['nombre_completo'],
                 telefono=request.form.get('telefono'),
                 correo=request.form['correo'],
-                direccion=request.form.get('direccion')
+                direccion=request.form.get('direccion'),
+                username=request.form.get('username')
             )
+            # Guardar contraseña
+            cliente.set_password(request.form.get('password'))
             
             db.session.add(cliente)
             db.session.commit()
@@ -47,6 +55,7 @@ def detalle(cliente_id):
     return render_template('clientes/detalle.html', cliente=cliente)
 
 @clientes_bp.route('/<cliente_id>/editar', methods=['GET', 'POST'])
+@admin_required
 def editar(cliente_id):
     """Editar un cliente existente."""
     cliente = Cliente.query.get_or_404(cliente_id)
@@ -75,6 +84,7 @@ def editar(cliente_id):
     return render_template('clientes/editar.html', cliente=cliente)
 
 @clientes_bp.route('/<cliente_id>/eliminar', methods=['POST'])
+@admin_required
 def eliminar(cliente_id):
     """Eliminar un cliente."""
     cliente = Cliente.query.get_or_404(cliente_id)

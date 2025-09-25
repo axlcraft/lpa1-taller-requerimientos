@@ -26,6 +26,7 @@ class Hotel(BaseModel):
     politicas_cancelacion = db.relationship("PoliticaCancelacion", back_populates="hotel", cascade="all, delete-orphan")
     temporadas = db.relationship("Temporada", back_populates="hotel", cascade="all, delete-orphan")
     fotos = db.relationship("Foto", back_populates="hotel", cascade="all, delete-orphan")
+    calificaciones = db.relationship("Calificacion", back_populates="hotel", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Hotel {self.nombre} ({self.id})>"

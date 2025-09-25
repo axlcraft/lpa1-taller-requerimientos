@@ -44,7 +44,9 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('hoteles.listar') }}">Ver Hoteles</a></li>
+                            {% if session.get('is_superuser') %}
                             <li><a class="dropdown-item" href="{{ url_for('hoteles.crear') }}">Nuevo Hotel</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -53,7 +55,9 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('habitaciones.listar') }}">Ver Habitaciones</a></li>
+                            {% if session.get('is_superuser') %}
                             <li><a class="dropdown-item" href="{{ url_for('habitaciones.crear') }}">Nueva Habitación</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

@@ -2,16 +2,20 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models import Habitacion, Hotel, TipoHabitacion, EstadoHabitacion
 from app.extensions import db
+from app.routes.auth import admin_required
 
 habitaciones_bp = Blueprint('habitaciones', __name__)
 
 @habitaciones_bp.route('/')
 def listar():
-    """Lista todas las habitaciones."""
+    """Lista todas las habitaciones y hoteles activos para el filtro."""
     habitaciones = Habitacion.query.join(Hotel).all()
-    return render_template('habitaciones/listar.html', habitaciones=habitaciones)
+    from app.models.enums import EstadoHotel
+    hoteles = Hotel.query.filter_by(estado=EstadoHotel.ACTIVO).all()
+    return render_template('habitaciones/listar.html', habitaciones=habitaciones, hoteles=hoteles)
 
 @habitaciones_bp.route('/crear', methods=['GET', 'POST'])
+@admin_required
 def crear():
     """Crear una nueva habitación."""
     from app.models.enums import EstadoHotel
@@ -46,16 +50,18 @@ def crear():
 def detalle(habitacion_id):
     """Detalle de una habitación específica."""
     habitacion = Habitacion.query.get_or_404(habitacion_id)
-    
-    # Calcular calificación promedio
-    calificaciones = [c.puntuacion for c in habitacion.calificaciones]
-    calificacion_promedio = sum(calificaciones) / len(calificaciones) if calificaciones else 0
-    
+    # Calcular calificación promedio usando el nuevo modelo de estrellas
+    calificaciones_objs = habitacion.calificaciones or []
+    estrellas = [c.estrellas_habitacion for c in calificaciones_objs if c.estrellas_habitacion is not None]
+    calificacion_promedio = sum(estrellas) / len(estrellas) if estrellas else 0
+
     return render_template('habitaciones/detalle.html', 
                          habitacion=habitacion,
-                         calificacion_promedio=calificacion_promedio)
+                         calificacion_promedio=calificacion_promedio,
+                         calificaciones=calificaciones_objs)
 
 @habitaciones_bp.route('/<habitacion_id>/editar', methods=['GET', 'POST'])
+@admin_required
 def editar(habitacion_id):
     """Editar una habitación existente."""
     habitacion = Habitacion.query.get_or_404(habitacion_id)
@@ -89,6 +95,7 @@ def editar(habitacion_id):
                          estados=EstadoHabitacion)
 
 @habitaciones_bp.route('/<habitacion_id>/eliminar', methods=['POST'])
+@admin_required
 def eliminar(habitacion_id):
     """Eliminar una habitación."""
     habitacion = Habitacion.query.get_or_404(habitacion_id)

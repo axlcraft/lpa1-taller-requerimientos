@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Detalle Habitación</title>
+  </head>
+  <body>
+    <h1>Habitación {{ habitacion.id }}</h1>
+    <p>Tipo: {{ habitacion.tipo }}</p>
+    <p>Precio: ${{ habitacion.precio_base }}</p>
+    <p>Calificación promedio: {{ calificacion_promedio }}</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for cat, msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </body>
+</html>

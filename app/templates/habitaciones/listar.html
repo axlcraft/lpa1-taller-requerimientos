@@ -1,36 +1,80 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    .table tbody tr td, .form-label, .form-select, h2, th {
+        color: #ffffff !important;
+    }
+    .form-select, .form-select option {
+        background-color: #222 !important;
+        color: #fff !important;
+    }
+</style>
 <div class="container mt-4">
     <h2>Listado de Habitaciones</h2>
+    {% if session.get('is_superuser') %}
     <a href="{{ url_for('habitaciones.crear') }}" class="btn btn-primary mb-3">Nueva Habitación</a>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Hotel</th>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Precio Base</th>
-                <th>Capacidad</th>
-                <th>Estado</th>
+    {% endif %}
+
+    <div class="mb-3">
+        <label for="hotel-filter" class="form-label">Filtrar por Hotel</label>
+        <select id="hotel-filter" class="form-select">
+            <option value="">Todos los Hoteles</option>
+            {% for hotel in hoteles %}
+                <option value="{{ hotel.id }}">{{ hotel.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <table class="table table-bordered table-hover shadow-lg rounded-4 overflow-hidden" style="background: linear-gradient(90deg, #232526 0%, #414345 100%); border-radius: 1rem;">
+        <thead class="bg-dark text-light">
+            <tr style="background: linear-gradient(90deg, #232526 0%, #414345 100%);">
+                <th class="border-0">#</th>
+                <th class="border-0">Hotel</th>
+                <th class="border-0">Tipo</th>
+                <th class="border-0">Descripción</th>
+                <th class="border-0">Precio Base</th>
+                <th class="border-0">Capacidad</th>
+                <th class="border-0">Estado</th>
+                <th class="border-0">Acción</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody style="background: rgba(44,44,44,0.95);">
             {% for habitacion in habitaciones %}
-            <tr>
+            <tr style="transition: background 0.2s;">
                 <td>{{ loop.index }}</td>
-                <td>{{ habitacion.hotel.nombre }}</td>
+                <td data-hotel-id="{{ habitacion.hotel.id }}">{{ habitacion.hotel.nombre }}</td>
                 <td>{{ habitacion.tipo.value }}</td>
                 <td>{{ habitacion.descripcion }}</td>
-                <td>{{ habitacion.precio_base }}</td>
+                <td><span class="fw-bold text-success">${{ habitacion.precio_base }}</span></td>
                 <td>{{ habitacion.capacidad }}</td>
                 <td>{{ habitacion.estado.value }}</td>
                 <td>
-                    <a href="{{ url_for('reservas.crear', habitacion_id=habitacion.id) }}" class="btn btn-sm btn-primary">Reservar</a>
+                    <a href="{{ url_for('reservas.crear', habitacion_id=habitacion.id) }}" class="btn btn-sm btn-primary rounded-pill px-3">Reservar</a>
+                    {% if session.get('is_superuser') %}
+                    <a href="{{ url_for('habitaciones.editar', habitacion_id=habitacion.id) }}" class="btn btn-sm btn-warning ms-1">Editar</a>
+                    <form method="POST" action="{{ url_for('habitaciones.eliminar', habitacion_id=habitacion.id) }}" class="d-inline" onsubmit="return confirm('¿Eliminar esta habitación?')">
+                        <button type="submit" class="btn btn-sm btn-danger ms-1">Eliminar</button>
+                    </form>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+    document.getElementById('hotel-filter').addEventListener('change', function() {
+        const selectedHotel = this.value;
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const hotelId = row.querySelector('td:nth-child(2)').dataset.hotelId;
+            if (!selectedHotel || hotelId === selectedHotel) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 {% endblock %}

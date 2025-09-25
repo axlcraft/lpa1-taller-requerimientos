@@ -16,4 +16,14 @@
     </div>
     <a href="{{ url_for('reservas.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>
 </div>
+
+<div class="container mt-4">
+    <h3>Califica tu experiencia</h3>
+    {% if reserva.estado.name == 'COMPLETADA' or (reserva.fecha_fin and reserva.fecha_fin < current_date) %}
+        <p>Puedes calificar tu estadía haciendo click en el siguiente botón:</p>
+        <a href="{{ url_for('evaluaciones.calificar', habitacion_id=reserva.habitacion_id, reserva_id=reserva.id) }}" class="btn btn-primary">Calificar ahora</a>
+    {% else %}
+        <p class="text-muted">Las calificaciones están disponibles una vez finalizada la estadía.</p>
+    {% endif %}
+</div>
 {% endblock %}

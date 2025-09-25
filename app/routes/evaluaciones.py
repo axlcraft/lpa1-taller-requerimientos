@@ -54,12 +54,22 @@ def calificar(habitacion_id):
     if request.method == 'POST':
         try:
             cliente_id = request.form['cliente_id']
-            puntuacion = int(request.form['puntuacion'])
+            # Compatibilidad: aceptar 'puntuacion' antiguo o los nuevos campos de estrellas
+            if 'puntuacion' in request.form:
+                puntuacion = int(request.form['puntuacion'])
+                estrellas_habitacion = puntuacion
+                estrellas_hotel = int(request.form.get('estrellas_hotel', puntuacion))
+                estrellas_atencion = int(request.form.get('estrellas_atencion', puntuacion))
+            else:
+                estrellas_habitacion = int(request.form.get('estrellas_habitacion', 0))
+                estrellas_hotel = int(request.form.get('estrellas_hotel', 0))
+                estrellas_atencion = int(request.form.get('estrellas_atencion', 0))
             
-            # Validar puntuación
-            if puntuacion < 1 or puntuacion > 5:
-                flash('La calificación debe estar entre 1 y 5', 'error')
-                return render_template('evaluaciones/calificar.html', habitacion=habitacion, clientes=clientes)
+            # Validar puntuaciones
+            for v in (estrellas_habitacion, estrellas_hotel, estrellas_atencion):
+                if v < 1 or v > 5:
+                    flash('Las calificaciones deben estar entre 1 y 5', 'error')
+                    return render_template('evaluaciones/calificar.html', habitacion=habitacion, clientes=clientes)
             
             # Verificar si el cliente tuvo una reserva completada en esta habitación
             reserva_completada = Reserva.query.filter_by(
@@ -77,18 +87,23 @@ def calificar(habitacion_id):
                 cliente_id=cliente_id,
                 habitacion_id=habitacion_id
             ).first()
-            
+
             if calificacion_existente:
                 # Actualizar calificación existente
-                calificacion_existente.puntuacion = puntuacion
+                calificacion_existente.estrellas_habitacion = estrellas_habitacion
+                calificacion_existente.estrellas_hotel = estrellas_hotel
+                calificacion_existente.estrellas_atencion = estrellas_atencion
                 calificacion_existente.fecha = datetime.utcnow()
                 flash('Calificación actualizada exitosamente', 'success')
             else:
                 # Crear nueva calificación
                 calificacion = Calificacion(
-                    puntuacion=puntuacion,
+                    estrellas_habitacion=estrellas_habitacion,
+                    estrellas_hotel=estrellas_hotel,
+                    estrellas_atencion=estrellas_atencion,
                     cliente_id=cliente_id,
-                    habitacion_id=habitacion_id
+                    habitacion_id=habitacion_id,
+                    hotel_id=habitacion.hotel_id
                 )
                 db.session.add(calificacion)
                 flash('Calificación agregada exitosamente', 'success')

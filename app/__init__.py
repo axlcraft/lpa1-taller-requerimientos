@@ -14,6 +14,13 @@ def create_app(config_name=None):
 
     # Inicializar extensiones
     db.init_app(flask_app)
+    # Evitar que los objetos expiren después de commit (mejora ergonomía en tests)
+    with flask_app.app_context():
+        try:
+            db.session.expire_on_commit = False
+        except Exception:
+            # En algunos entornos el session puede no estar creado aún; ignorar silenciosamente
+            pass
 
     # Función para inyectar variables globales en templates
     @flask_app.context_processor
@@ -28,6 +35,12 @@ def create_app(config_name=None):
         flask_app.register_blueprint(main_bp)
     except ImportError as e:
         print(f"Warning: Could not import main blueprint: {e}")
+
+    try:
+        from app.routes.auth import auth_bp
+        flask_app.register_blueprint(auth_bp, url_prefix='/auth')
+    except ImportError as e:
+        print(f"Warning: Could not import auth blueprint: {e}")
 
     try:
         from app.routes.hoteles import hoteles_bp

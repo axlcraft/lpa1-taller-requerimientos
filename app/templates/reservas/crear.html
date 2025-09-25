@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Nueva Reserva</h2>
-    <form method="POST">
+    <form method="POST" class="needs-validation" novalidate>
         <div class="mb-3">
             <label for="habitacion_id" class="form-label">Habitación</label>
             <select name="habitacion_id" id="habitacion_id" class="form-select" required>
@@ -12,13 +12,16 @@
             </select>
         </div>
         <div class="mb-3">
-            <label for="cliente_id" class="form-label">Cliente</label>
-            <select name="cliente_id" id="cliente_id" class="form-select" required>
-                <option value="no_registrado">No registrado</option>
-                {% for cliente in clientes %}
-                    <option value="{{ cliente.id }}">{{ cliente.nombre_completo }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label">Reserva para</label>
+            {% if cliente %}
+                <p class="form-control-plaintext">
+                    La reserva se realizará para: 
+                    <span class="badge bg-light text-dark ms-2" style="font-size:1rem;">{{ cliente.nombre_completo }}</span>
+                </p>
+            {% else %}
+                <p class="form-control-plaintext text-warning">La reserva se realizará para el cliente que haya iniciado sesión.</p>
+            {% endif %}
+            <small class="form-text text-muted">Si no has iniciado sesión, por favor <a href="{{ url_for('auth.login_client') }}">inicia sesión</a> o <a href="{{ url_for('clientes.registrar') }}">regístrate</a>.</small>
         </div>
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha de entrada</label>
@@ -40,7 +43,30 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Crear Reserva</button>
+    <button type="submit" class="btn btn-primary">Crear Reserva</button>
     </form>
+
+    <div class="alert alert-success mt-4" id="pago-exitoso" style="display: none;">
+        <p>Reserva creada exitosamente. {% if nueva_reserva and nueva_reserva.transaccion_pago %}<a href="{{ url_for('pagos.realizar', transaccion_id=nueva_reserva.transaccion_pago.id) }}" class="btn btn-success">Realizar Pago</a>{% else %}Por favor, verifica los detalles de la reserva.{% endif %}</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('reserva_creada')) {
+                document.getElementById('pago-exitoso').style.display = 'block';
+            }
+            // Bootstrap validation
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        });
+    </script>
 </div>
 {% endblock %}

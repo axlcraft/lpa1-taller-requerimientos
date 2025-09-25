@@ -12,6 +12,10 @@ class Config:
         'pool_pre_ping': True,
         'pool_recycle': 300,
     }
+    # Evitar que SQLAlchemy expire objetos después de commit en el session (útil para tests)
+    SQLALCHEMY_SESSION_OPTIONS = {
+        'expire_on_commit': False
+    }
     
     # Seguridad
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -19,6 +23,9 @@ class Config:
     # Configuración adicional para el desarrollo
     DEBUG = True
     TEMPLATES_AUTO_RELOAD = True
+    # Credenciales de superusuario (para desarrollo). Cambiar en producción.
+    SUPERUSER_USERNAME = os.environ.get('SUPERUSER_USERNAME', 'admin')
+    SUPERUSER_PASSWORD = os.environ.get('SUPERUSER_PASSWORD', 'admin123')
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo con MySQL."""

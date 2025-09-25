@@ -27,6 +27,31 @@ city_data = [
 app = create_app()
 
 with app.app_context():
+    # Hoteles elegantes y únicos por ciudad
+    luxury_names = [
+        "Palacio de Cristal", "Royal Diamond Suites", "Majestic Pearl Resort", "Imperial Gold Palace", "Eclipse Luxury Retreat",
+        "Grand Sapphire Hotel", "Opulent Crown Resort", "Celestial Elegance Suites", "Noble Heritage Palace", "Starlight Prestige Hotel",
+        "Luxe Infinity Resort", "Regency Platinum Palace", "Golden Horizon Retreat", "Elite Velvet Suites", "Prestige Emerald Hotel",
+        "Aurora Grand Palace"
+    ]
+    luxury_descriptions = [
+        "Un refugio de lujo y distinción, donde cada detalle está diseñado para una experiencia inolvidable y exclusiva.",
+        "Descubre la elegancia suprema en un entorno sofisticado, con servicios personalizados y atención de primer nivel.",
+        "Vive el esplendor y la comodidad en un hotel que redefine el concepto de lujo y exclusividad.",
+        "Sumérgete en la opulencia y el glamour, rodeado de arquitectura majestuosa y ambientes refinados.",
+        "El lugar donde el lujo y la modernidad se fusionan para ofrecerte una estancia única y memorable.",
+        "Disfruta de la excelencia y el confort en un hotel pensado para los gustos más exigentes.",
+        "Un oasis de sofisticación y serenidad, ideal para quienes buscan lo mejor en hospitalidad.",
+        "La máxima expresión de lujo, con espacios diseñados para el deleite y el descanso absoluto.",
+        "Déjate cautivar por la exclusividad y el diseño vanguardista en cada rincón de este hotel.",
+        "Un destino de lujo incomparable, donde la atención al detalle marca la diferencia.",
+        "El hotel perfecto para quienes valoran la elegancia, el confort y la distinción.",
+        "Un palacio moderno que combina tradición y lujo en cada experiencia.",
+        "La joya de la ciudad, con servicios premium y ambientes de ensueño.",
+        "Un espacio donde el lujo se vive y se siente en cada momento.",
+        "La excelencia hotelera en su máxima expresión, pensada para los viajeros más exclusivos.",
+        "Un hotel que eleva el concepto de lujo a otro nivel, con atención personalizada y ambientes únicos."
+    ]
 
     # Datos personalizados para hoteles por ciudad
     custom_hotels = {
@@ -96,20 +121,38 @@ with app.app_context():
         ],
     }
 
+
+    # Calidades para hoteles
+    calidades = ["Estándar", "Premium", "VIP", "Superior"]
+
     for city in city_data:
         destino = city["destino"]
-        for i in range(2):
-            if destino in custom_hotels:
+        hotel_descriptions = [
+            f"Descubre el lujo y la sofisticación en nuestro hotel insignia de {destino}, donde cada detalle está pensado para tu confort y exclusividad.",
+            f"Vive una experiencia única en {destino}: arquitectura elegante, gastronomía de autor y vistas espectaculares en cada rincón de nuestro hotel.",
+            f"Tu refugio de descanso y placer en {destino}, con servicios personalizados y atención de primera calidad.",
+            f"Un oasis urbano en {destino}, ideal para viajes de negocios o placer, con instalaciones modernas y ambiente acogedor."
+        ]
+        room_descriptions = [
+            f"Silver Suite: Modernidad y confort con detalles en plata, ideal para quienes buscan descanso y estilo en {destino}.",
+            f"Gold Room: Elegancia dorada, ambiente cálido y servicios premium para una estancia inolvidable en {destino}.",
+            f"Platinum Palace: El máximo lujo, con amenities de alta gama y vistas panorámicas exclusivas de {destino}.",
+            f"Silver Deluxe: Espacio extra y diseño vanguardista para los viajeros más exigentes en {destino}."
+        ]
+
+        # Generar 4 hoteles únicos por ciudad
+        for i in range(4):
+            if destino in custom_hotels and i < len(custom_hotels[destino]):
                 hotel_info = custom_hotels[destino][i]
                 nombre = hotel_info["nombre"]
                 direccion = hotel_info["direccion"]
                 telefono = hotel_info["telefono"]
                 correo = hotel_info["correo"]
             else:
-                nombre = f"Hotel {destino} #{i+1}"
-                direccion = f"Calle Principal {i+1}, {destino}"
-                telefono = f"+1-555-{i+1:04d}"
-                correo = f"info{i+1}@{destino.lower()}.com"
+                nombre = f"{calidades[i]} {destino} Hotel"
+                direccion = f"Avenida {i+1} Principal, {destino}"
+                telefono = f"+1-555-{str(city_data.index(city)+1).zfill(2)}{str(i+1).zfill(2)}"
+                correo = f"info{i+1}@{destino.lower()}hotel.com"
 
             hotel = Hotel(
                 nombre=nombre,
@@ -117,7 +160,7 @@ with app.app_context():
                 telefono=telefono,
                 correo=correo,
                 ubicacion_geografica=destino,
-                descripcion_servicios=f"Hotel en {destino} con servicios premium.",
+                descripcion_servicios=hotel_descriptions[i],
                 estado=EstadoHotel.ACTIVO
             )
             db.session.add(hotel)
@@ -126,7 +169,7 @@ with app.app_context():
             habitaciones = [
                 Habitacion(
                     tipo=TipoHabitacion.SILVER,
-                    descripcion="Habitación Silver",
+                    descripcion=room_descriptions[0],
                     precio_base=city['silver'],
                     capacidad=2,
                     estado=EstadoHabitacion.ACTIVA,
@@ -134,7 +177,7 @@ with app.app_context():
                 ),
                 Habitacion(
                     tipo=TipoHabitacion.GOLD,
-                    descripcion="Habitación Gold",
+                    descripcion=room_descriptions[1],
                     precio_base=city['gold'],
                     capacidad=2,
                     estado=EstadoHabitacion.ACTIVA,
@@ -142,7 +185,7 @@ with app.app_context():
                 ),
                 Habitacion(
                     tipo=TipoHabitacion.PLATINUM,
-                    descripcion="Habitación Platinum",
+                    descripcion=room_descriptions[2],
                     precio_base=city['platinum'],
                     capacidad=2,
                     estado=EstadoHabitacion.ACTIVA,
@@ -150,7 +193,7 @@ with app.app_context():
                 ),
                 Habitacion(
                     tipo=TipoHabitacion.SILVER,
-                    descripcion="Habitación Silver Extra",
+                    descripcion=room_descriptions[3],
                     precio_base=city['silver'],
                     capacidad=2,
                     estado=EstadoHabitacion.ACTIVA,
@@ -158,5 +201,53 @@ with app.app_context():
                 ),
             ]
             db.session.add_all(habitaciones)
+
+        # Agregar hotel elegante, único y lujoso por ciudad
+        idx = city_data.index(city)
+        nombre_lujo = f"{luxury_names[idx]} {destino}"
+        direccion_lujo = f"Boulevard de la Elegancia 1, {destino}"
+        telefono_lujo = f"+1-555-{str(idx+1).zfill(2)}99"
+        correo_lujo = f"luxury{idx+1}@{destino.lower()}hotel.com"
+        descripcion_lujo = luxury_descriptions[idx]
+
+        hotel_lujo = Hotel(
+            nombre=nombre_lujo,
+            direccion=direccion_lujo,
+            telefono=telefono_lujo,
+            correo=correo_lujo,
+            ubicacion_geografica=destino,
+            descripcion_servicios=descripcion_lujo,
+            estado=EstadoHotel.ACTIVO
+        )
+        db.session.add(hotel_lujo)
+        db.session.flush()
+
+        habitaciones_lujo = [
+            Habitacion(
+                tipo=TipoHabitacion.PLATINUM,
+                descripcion=f"Suite Royal Platinum: El máximo lujo y confort en {destino}.",
+                precio_base=city['platinum'] + 100,
+                capacidad=2,
+                estado=EstadoHabitacion.ACTIVA,
+                hotel_id=hotel_lujo.id
+            ),
+            Habitacion(
+                tipo=TipoHabitacion.GOLD,
+                descripcion=f"Suite Gold Prestige: Elegancia y exclusividad en cada detalle en {destino}.",
+                precio_base=city['gold'] + 80,
+                capacidad=2,
+                estado=EstadoHabitacion.ACTIVA,
+                hotel_id=hotel_lujo.id
+            ),
+            Habitacion(
+                tipo=TipoHabitacion.SILVER,
+                descripcion=f"Suite Silver Deluxe: Modernidad y distinción en {destino}.",
+                precio_base=city['silver'] + 60,
+                capacidad=2,
+                estado=EstadoHabitacion.ACTIVA,
+                hotel_id=hotel_lujo.id
+            ),
+        ]
+        db.session.add_all(habitaciones_lujo)
     db.session.commit()
-    print("✅ Hoteles y habitaciones insertados correctamente.")
+    print("✅ 4 hoteles únicos por ciudad insertados correctamente.")

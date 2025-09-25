@@ -14,12 +14,9 @@
             </select>
         </div>
         <div class="mb-3">
-            <label for="cliente_id" class="form-label">Cliente</label>
-            <select name="cliente_id" id="cliente_id" class="form-select" required>
-                {% for cliente in clientes %}
-                    <option value="{{ cliente.id }}" {% if reserva.cliente_id == cliente.id %}selected{% endif %}>{{ cliente.nombre_completo }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label">Cliente</label>
+            <p class="form-control-plaintext">{{ reserva.cliente.nombre_completo }}</p>
+            <small class="form-text text-muted">Si necesitas cambiar el cliente, usa el panel de administración.</small>
         </div>
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha de entrada</label>

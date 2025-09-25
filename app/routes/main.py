@@ -85,9 +85,13 @@ def detalle_habitacion(habitacion_id):
     """Detalle de una habitación específica."""
     habitacion = Habitacion.query.get_or_404(habitacion_id)
     
-    # Calcular calificación promedio
-    calificaciones = [c.puntuacion for c in habitacion.calificaciones]
-    calificacion_promedio = sum(calificaciones) / len(calificaciones) if calificaciones else 0
+    # Calcular calificación promedio usando el campo moderno 'estrellas_habitacion'
+    calificaciones_vals = []
+    for c in habitacion.calificaciones:
+        val = getattr(c, 'estrellas_habitacion', None) or getattr(c, 'puntuacion', None)
+        if val is not None:
+            calificaciones_vals.append(val)
+    calificacion_promedio = sum(calificaciones_vals) / len(calificaciones_vals) if calificaciones_vals else 0
     
     return render_template('detalle_habitacion.html', 
                          habitacion=habitacion,

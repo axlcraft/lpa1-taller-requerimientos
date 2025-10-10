@@ -18,9 +18,23 @@ def listar():
         query = query.filter(Hotel.estado == EstadoHotel[estado.upper()])
     hoteles = query.all()
 
-    # Obtener lista de ciudades únicas
-    ciudades = [h.ubicacion_geografica for h in Hotel.query.distinct(Hotel.ubicacion_geografica).all()]
-    return render_template('hoteles/listar.html', hoteles=hoteles, ciudades=ciudades, ciudad_sel=ciudad, estado_sel=estado)
+    # Agrupar hoteles por ciudad para el desplegable
+    hoteles_por_ciudad = {}
+    for hotel in Hotel.query.all():
+        ciudad_hotel = hotel.ubicacion_geografica
+        if ciudad_hotel not in hoteles_por_ciudad:
+            hoteles_por_ciudad[ciudad_hotel] = []
+        hoteles_por_ciudad[ciudad_hotel].append(hotel)
+    
+    # Obtener lista de ciudades únicas desde el diccionario
+    ciudades = list(hoteles_por_ciudad.keys())
+    
+    return render_template('hoteles/listar.html', 
+                         hoteles=hoteles, 
+                         ciudades=ciudades, 
+                         hoteles_por_ciudad=hoteles_por_ciudad,
+                         ciudad_sel=ciudad, 
+                         estado_sel=estado)
 
 @hoteles_bp.route('/crear', methods=['GET', 'POST'])
 @admin_required
@@ -49,15 +63,34 @@ def crear():
 
 @hoteles_bp.route('/<hotel_id>')
 def detalle(hotel_id):
-    """Detalle de un hotel específico con habitaciones disponibles."""
+    """Detalle de un hotel específico con habitaciones disponibles y promociones."""
+    from datetime import date
     hotel = Hotel.query.get_or_404(hotel_id)
     habitaciones_disponibles = [h for h in hotel.habitaciones if h.estado.name == 'ACTIVA']
+    
     # Calcular calificación promedio del hotel
     calificaciones_objs = hotel.calificaciones or []
     estrellas_hotel = [c.estrellas_hotel for c in calificaciones_objs if c.estrellas_hotel is not None]
     promedio_hotel = sum(estrellas_hotel) / len(estrellas_hotel) if estrellas_hotel else 0
 
-    return render_template('hoteles/detalle.html', hotel=hotel, habitaciones=habitaciones_disponibles, promedio_hotel=promedio_hotel, calificaciones=calificaciones_objs)
+    # Obtener promociones del hotel ordenadas por estado (activas primero)
+    promociones = hotel.promociones
+    today = date.today()
+    
+    # Separar promociones por estado para mejor presentación
+    promociones_activas = [p for p in promociones if p.fecha_inicio <= today <= p.fecha_fin]
+    promociones_futuras = [p for p in promociones if p.fecha_inicio > today]
+    promociones_expiradas = [p for p in promociones if p.fecha_fin < today]
+
+    return render_template('hoteles/detalle.html', 
+                         hotel=hotel, 
+                         habitaciones=habitaciones_disponibles, 
+                         promedio_hotel=promedio_hotel, 
+                         calificaciones=calificaciones_objs,
+                         promociones_activas=promociones_activas,
+                         promociones_futuras=promociones_futuras, 
+                         promociones_expiradas=promociones_expiradas,
+                         today=today)
 
 @hoteles_bp.route('/<hotel_id>/editar', methods=['GET', 'POST'])
 @admin_required

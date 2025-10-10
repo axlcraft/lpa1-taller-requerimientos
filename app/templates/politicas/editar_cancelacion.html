@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Política de Cancelación - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Política de Cancelación
+                    <small class="text-muted ms-2">{{ politica.hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Nombre de la Política *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   value="{{ politica.nombre }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="penalidad" class="form-label">
+                                <i class="fas fa-dollar-sign me-1"></i>Penalidad (Monto Fijo)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="penalidad" 
+                                       name="penalidad" 
+                                       step="0.01" 
+                                       min="0"
+                                       value="{{ politica.penalidad }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dias_anticipacion_reembolso" class="form-label">
+                                <i class="fas fa-calendar-days me-1"></i>Días de Anticipación
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="dias_anticipacion_reembolso" 
+                                   name="dias_anticipacion_reembolso" 
+                                   min="0"
+                                   value="{{ politica.dias_anticipacion_reembolso }}">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="descripcion" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Descripción
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descripcion" 
+                                      name="descripcion" 
+                                      rows="4">{{ politica.descripcion }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('politicas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Actualizar Política
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

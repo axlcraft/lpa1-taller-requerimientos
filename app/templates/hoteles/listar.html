@@ -1,17 +1,60 @@
 {% extends "base.html" %}
 
-{% block title %}Hoteles - {{ app_name }}{% endblock %}
+{% block title %}Hoteles{% endblock %}
 
 {% block content %}
 
 <style>
-    .table tbody tr td, .form-label, .form-select, h2, th {
-        color: #ffffff !important;
-    }
-    .form-select, .form-select option {
-        background-color: #222 !important;
-        color: #fff !important;
-    }
+.city-dropdown {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+.city-selector {
+    background-color: #333 !important;
+    border: 2px solid #555;
+    border-radius: 0.5rem;
+    color: #fff !important;
+    font-size: 1.1rem;
+    padding: 0.75rem;
+}
+.hotels-container {
+    display: none;
+    border-radius: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+.hotels-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+.hotels-container > * {
+    position: relative;
+    z-index: 2;
+}
+.hotels-container.active {
+    display: block;
+}
+.city-header {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -23,86 +66,65 @@
     {% endif %}
 </div>
 
-<form id="filtro-hoteles" method="get" class="row g-3 mb-4">
-    <div class="col-md-4">
-        <select name="ciudad" class="form-select" onchange="document.getElementById('filtro-hoteles').submit();">
-            <option value="">Todas las ciudades</option>
-            {% for c in ciudades %}
-                <option value="{{ c }}" {% if ciudad_sel == c %}selected{% endif %}>{{ c }}</option>
-            {% endfor %}
-        </select>
+<!-- Selector de Ciudad -->
+<div class="city-dropdown">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h3><i class="fas fa-globe-americas me-2"></i>Explorar por Ciudad</h3>
+            <p class="text-muted mb-0">Selecciona una ciudad para ver sus hoteles</p>
+        </div>
+        <div class="col-md-6">
+            <select id="citySelector" class="form-select city-selector">
+                <option value="">🌍 Selecciona una ciudad</option>
+                {% for ciudad in ciudades|sort %}
+                <option value="{{ ciudad }}">🏙️ {{ ciudad }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    <div class="col-md-4">
-        <select name="estado" class="form-select" onchange="document.getElementById('filtro-hoteles').submit();">
-            <option value="">Todos los estados</option>
-            <option value="activo" {% if estado_sel == 'activo' %}selected{% endif %}>Activo</option>
-            <option value="inactivo" {% if estado_sel == 'inactivo' %}selected{% endif %}>Inactivo</option>
-        </select>
-    </div>
-</form>
+</div>
 
-{% if hoteles %}
-<div class="row">
-    {% for hotel in hoteles %}
-    <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 shadow-lg border-0 rounded-4" style="background: linear-gradient(135deg, #232526 0%, #414345 100%); border-radius: 1.5rem;">
-            {% set city = (hotel.ubicacion_geografica or '').lower().replace(' ', '_') %}
-            {% set city_image = 'static/' + city + '.png' %}
-            {% set img_url = url_for('static', filename=city + '.png') %}
-            <img src="{{ img_url }}" alt="{{ hotel.ubicacion_geografica }}" class="card-img-top" style="height:160px; object-fit:cover; border-top-left-radius:1.5rem; border-top-right-radius:1.5rem;" onerror="this.style.display='none'">
-            <div class="card-body">
-                <h5 class="card-title">{{ hotel.nombre }}</h5>
-                <p class="card-text">
-                    <small class="text-muted">
-                        <i class="fas fa-map-marker-alt me-1"></i>{{ hotel.ubicacion_geografica or 'No especificado' }}
-                    </small>
-                </p>
-                {% if hotel.direccion %}
-                <p class="card-text">
-                    <i class="fas fa-home me-1"></i>{{ hotel.direccion }}
-                </p>
-                {% endif %}
-                
-                <p class="card-text">{{ hotel.descripcion_servicios[:100] if hotel.descripcion_servicios }}{% if hotel.descripcion_servicios and hotel.descripcion_servicios|length > 100 %}...{% endif %}</p>
-                    <p class="card-text">{{ hotel.descripcion_servicios[:100] if hotel.descripcion_servicios }}{% if hotel.descripcion_servicios and hotel.descripcion_servicios|length > 100 %}...{% endif %}</p>
-                
-                <div class="row text-center mb-3">
-                    <div class="col">
-                        <span class="badge bg-{{ 'success' if hotel.estado.value == 'activo' else 'secondary' }} fs-6">
-                            {{ hotel.estado.value.title() }}
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="row text-center">
-                    <div class="col-4">
-                        <small class="text-muted">Habitaciones</small>
-                        <br>
-                        <strong>{{ hotel.habitaciones|length }}</strong>
-                    </div>
-                    <div class="col-4">
-                        <small class="text-muted">Promociones</small>
-                        <br>
-                        <strong>{{ hotel.promociones|length }}</strong>
-                    </div>
-                    <div class="col-4">
-                        <small class="text-muted">Fotos</small>
-                        <br>
-                        <strong>{{ hotel.fotos|length }}</strong>
-                    </div>
-                </div>
-                    <div class="row text-center mb-3">
-                        <div class="col">
-                            <small class="text-muted">Precio</small>
+<!-- Contenedores de hoteles por ciudad -->
+{% for ciudad, hoteles_ciudad in hoteles_por_ciudad.items() %}
+<div id="hotels-{{ ciudad|replace(' ', '-')|replace(',', '')|replace('.', '') }}" 
+     class="hotels-container" 
+     data-city="{{ ciudad }}">
+    <div class="city-header">
+        <h2 class="text-white"><i class="fas fa-map-marker-alt me-2"></i>{{ ciudad }}</h2>
+        <p class="text-light mb-0">{{ hoteles_ciudad|length }} hoteles encontrados</p>
+    </div>
+    <div class="row">
+        {% for hotel in hoteles_ciudad %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-lg border-0 rounded-4" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);">
+                <div class="card-body">
+                    <h5 class="card-title text-white">{{ hotel.nombre }}</h5>
+                    <p class="card-text text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ hotel.ubicacion_geografica }}
+                    </p>
+                    {% if hotel.direccion %}
+                    <p class="card-text text-white">
+                        <i class="fas fa-home me-1"></i>{{ hotel.direccion }}
+                    </p>
+                    {% endif %}
+                    <p class="card-text text-white">{{ hotel.descripcion_servicios[:100] if hotel.descripcion_servicios }}...</p>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted">Habitaciones</small>
                             <br>
-                            <strong>${{ hotel.precio }}</strong>
+                            <strong class="text-white">{{ hotel.habitaciones|length }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Estado</small>
+                            <br>
+                            <span class="badge bg-success">{{ hotel.estado.value.title() }}</span>
                         </div>
                     </div>
-            </div>
-            
-            <div class="card-footer">
-                <div class="d-flex justify-content-between">
-                    <div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
                         <a href="{{ url_for('hoteles.detalle', hotel_id=hotel.id) }}" class="btn btn-info btn-sm">
                             <i class="fas fa-eye me-1"></i>Ver
                         </a>
@@ -112,44 +134,77 @@
                         </a>
                         {% endif %}
                     </div>
-                    {% if session.get('is_superuser') %}
-                    <form method="POST" action="{{ url_for('hoteles.eliminar', hotel_id=hotel.id) }}" class="d-inline" 
-                          onsubmit="return confirm('¿Está seguro de eliminar este hotel?')">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash me-1"></i>Eliminar
-                        </button>
-                    </form>
-                    {% endif %}
                 </div>
-                
-                {% if hotel.correo or hotel.telefono %}
-                <div class="mt-2">
-                    {% if hotel.correo %}
-                    <small class="text-muted d-block">
-                        <i class="fas fa-envelope me-1"></i>{{ hotel.correo }}
-                    </small>
-                    {% endif %}
-                    {% if hotel.telefono %}
-                    <small class="text-muted d-block">
-                        <i class="fas fa-phone me-1"></i>{{ hotel.telefono }}
-                    </small>
-                    {% endif %}
-                </div>
-                {% endif %}
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
-{% else %}
-<div class="text-center py-5">
+{% endfor %}
+
+<!-- Mensaje por defecto -->
+<div id="no-hotels" class="text-center py-5">
     <i class="fas fa-building fa-4x text-muted mb-3"></i>
-    <h3 class="text-muted">No hay hoteles registrados</h3>
-    <p class="text-muted">Comience agregando su primer hotel al sistema</p>
-    <a href="{{ url_for('hoteles.crear') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Crear Primer Hotel
-    </a>
+    <h3 class="text-muted">Selecciona una ciudad para ver hoteles</h3>
+    <p class="text-muted">Usa el desplegable de arriba para explorar los hoteles disponibles</p>
 </div>
-{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const citySelector = document.getElementById('citySelector');
+    const hotelsContainers = document.querySelectorAll('.hotels-container');
+    const noHotels = document.getElementById('no-hotels');
+    
+    // Mapeo de ciudades a nombres de archivos de imagen
+    const cityImageMap = {
+        'Aruba': 'aruba.png',
+        'Bahamas': 'bahamas.png',
+        'Cancún': 'cancun.png',
+        'Hawaii': 'hawaii.png',
+        'Jamaica': 'jamaica.png',
+        'Madrid': 'madrid.png',
+        'Miami': 'miami.png',
+        'Moscu': 'moscu.png',
+        'NewYork': 'newyork.png',
+        'Panamá': 'panama.png',
+        'Paris': 'paris.png',
+        'Rome': 'rome.png',
+        'Seul': 'seul.png',
+        'Sidney': 'sidney.png',
+        'Taipei': 'taipei.png',
+        'Tokio': 'tokio.png',
+        'Bariloche, Argentina': 'newyork.png' // Imagen por defecto
+    };
+    
+    // Establecer imágenes de fondo para cada contenedor
+    hotelsContainers.forEach(container => {
+        const cityName = container.getAttribute('data-city');
+        const imageName = cityImageMap[cityName];
+        if (imageName) {
+            container.style.backgroundImage = `url('/static/${imageName}')`;
+        }
+    });
+    
+    citySelector.addEventListener('change', function() {
+        const selectedCity = this.value;
+        
+        // Ocultar todos los contenedores
+        hotelsContainers.forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        if (selectedCity) {
+            const cityId = 'hotels-' + selectedCity.replace(/[\s,\.]/g, '-');
+            const targetContainer = document.getElementById(cityId);
+            if (targetContainer) {
+                targetContainer.classList.add('active');
+            }
+            noHotels.style.display = 'none';
+        } else {
+            noHotels.style.display = 'block';
+        }
+    });
+});
+</script>
 
 {% endblock %}

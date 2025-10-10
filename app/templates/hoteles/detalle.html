@@ -11,6 +11,117 @@
             <p class="card-text">Estado: {{ hotel.estado }}</p>
         </div>
     </div>
+
+    <!-- Sección de Promociones -->
+    {% if promociones_activas or promociones_futuras or promociones_expiradas %}
+    <div class="mt-4">
+        <h3><i class="fas fa-tags me-2 text-success"></i>Promociones Disponibles</h3>
+        
+        <!-- Promociones Activas -->
+        {% if promociones_activas %}
+        <div class="mb-4">
+            <h5 class="text-success"><i class="fas fa-fire me-2"></i>¡Promociones Activas!</h5>
+            <div class="row">
+                {% for promocion in promociones_activas %}
+                <div class="col-md-6 mb-3">
+                    <div class="card border-success shadow-sm">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-tag me-1"></i>{{ promocion.nombre }}</h6>
+                            <span class="badge bg-light text-success fs-6">-{{ promocion.descuento }}%</span>
+                        </div>
+                        <div class="card-body">
+                            {% if promocion.descripcion %}
+                            <p class="card-text small">{{ promocion.descripcion }}</p>
+                            {% endif %}
+                            <p class="small text-muted mb-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                Válida hasta: <strong>{{ promocion.fecha_fin | fecha_es('%d de %B') }}</strong>
+                            </p>
+                            {% if promocion.servicios_adicionales %}
+                            <div class="mb-2">
+                                {% for servicio in promocion.servicios_as_list()[:3] %}
+                                <span class="badge bg-info me-1 small">{{ servicio }}</span>
+                                {% endfor %}
+                                {% if promocion.servicios_as_list()|length > 3 %}
+                                <span class="small text-muted">+{{ promocion.servicios_as_list()|length - 3 }} más...</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="d-grid">
+                                <a href="{{ url_for('promociones.detalle', promocion_id=promocion.id) }}" 
+                                   class="btn btn-success btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver Detalles y Reservar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Promociones Futuras -->
+        {% if promociones_futuras %}
+        <div class="mb-4">
+            <h6 class="text-warning"><i class="fas fa-clock me-2"></i>Próximamente</h6>
+            <div class="row">
+                {% for promocion in promociones_futuras %}
+                <div class="col-md-6 mb-2">
+                    <div class="card border-warning">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ promocion.nombre }}</h6>
+                                    <small class="text-muted">
+                                        Disponible desde: {{ promocion.fecha_inicio | fecha_es('%d de %B') }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-warning text-dark">-{{ promocion.descuento }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Promociones Expiradas (mostrar solo si no hay activas ni futuras) -->
+        {% if promociones_expiradas and not promociones_activas and not promociones_futuras %}
+        <div class="mb-4">
+            <h6 class="text-muted"><i class="fas fa-history me-2"></i>Promociones Anteriores</h6>
+            <div class="row">
+                {% for promocion in promociones_expiradas[:2] %}
+                <div class="col-md-6 mb-2">
+                    <div class="card border-secondary">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 text-muted">{{ promocion.nombre }}</h6>
+                                    <small class="text-muted">
+                                        Expiró: {{ promocion.fecha_fin | fecha_es('%d de %B') }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-secondary">-{{ promocion.descuento }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="mt-4">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Este hotel no tiene promociones disponibles en este momento.
+        </div>
+    </div>
+    {% endif %}
+
     <h3 class="mt-4">Habitaciones Disponibles</h3>
     {% if habitaciones %}
         <table class="table table-bordered mt-2">

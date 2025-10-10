@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Simulador de Precios Dinámicos - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1><i class="fas fa-calculator me-2"></i>Simulador de Precios Dinámicos</h1>
+        <p class="text-muted">{{ hotel.nombre }} - {{ hotel.ubicacion_geografica }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('temporadas.listar') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+</div>
+
+<!-- Formulario de Simulación -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search me-2"></i>Parámetros de Búsqueda</h5>
+            </div>
+            <div class="card-body">
+                <form id="simuladorForm">
+                    <div class="mb-3">
+                        <label for="habitacion_id" class="form-label">Habitación *</label>
+                        <select class="form-select" id="habitacion_id" name="habitacion_id" required>
+                            <option value="">Seleccione una habitación</option>
+                            {% for habitacion in habitaciones %}
+                            <option value="{{ habitacion.id }}" data-precio="{{ habitacion.precio_base }}">
+                                {{ habitacion.tipo.value }} - ${{ "%.2f"|format(habitacion.precio_base) }}/noche
+                                ({{ habitacion.capacidad }} personas)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="fecha_checkin" class="form-label">Check-in *</label>
+                            <input type="date" class="form-control" id="fecha_checkin" name="fecha_checkin" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fecha_checkout" class="form-label">Check-out *</label>
+                            <input type="date" class="form-control" id="fecha_checkout" name="fecha_checkout" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator me-2"></i>Calcular Precio
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Desglose de Precio</h5>
+            </div>
+            <div class="card-body" id="resultados">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-calculator fa-3x mb-3"></i>
+                    <p>Seleccione los parámetros y haga clic en "Calcular Precio" para ver el desglose detallado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del Sistema de Precios -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Cómo Funciona el Sistema de Tarifación Dinámica</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Modificadores por Temporada:</h6>
+                        <ul class="list-unstyled">
+                            <li><span class="badge bg-danger me-2">Alta</span> +50% sobre precio base</li>
+                            <li><span class="badge bg-warning me-2">Media</span> +20% sobre precio base</li>
+                            <li><span class="badge bg-success me-2">Baja</span> -20% sobre precio base</li>
+                            <li><span class="badge bg-secondary me-2">Regular</span> Precio base sin modificar</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Aplicación de Promociones:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Se aplica la mejor promoción activa</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Descuento sobre precio con temporada</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Solo promociones válidas en las fechas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configurar fecha mínima como hoy
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha_checkin').min = today;
+    document.getElementById('fecha_checkout').min = today;
+    
+    // Validar que checkout sea posterior a checkin
+    document.getElementById('fecha_checkin').addEventListener('change', function() {
+        document.getElementById('fecha_checkout').min = this.value;
+        if (document.getElementById('fecha_checkout').value < this.value) {
+            document.getElementById('fecha_checkout').value = '';
+        }
+    });
+});
+
+// Manejar envío del formulario
+document.getElementById('simuladorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        habitacion_id: formData.get('habitacion_id'),
+        fecha_checkin: formData.get('fecha_checkin'),
+        fecha_checkout: formData.get('fecha_checkout')
+    };
+    
+    // Mostrar loading
+    document.getElementById('resultados').innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Calculando...</span>
+            </div>
+            <p class="mt-2">Calculando precio dinámico...</p>
+        </div>
+    `;
+    
+    fetch('/temporadas/calcular-precio', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarResultados(data);
+        } else {
+            mostrarError(data.message);
+        }
+    })
+    .catch(error => {
+        mostrarError('Error al calcular el precio: ' + error.message);
+    });
+});
+
+function mostrarResultados(data) {
+    const promocionHtml = data.promocion ? `
+        <div class="alert alert-success">
+            <i class="fas fa-tag me-2"></i>
+            <strong>Promoción Aplicada:</strong> ${data.promocion.nombre}
+            <br><small>Descuento: ${data.promocion.descuento}%</small>
+        </div>
+    ` : '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>No hay promociones aplicables</div>';
+    
+    document.getElementById('resultados').innerHTML = `
+        <div class="mb-3">
+            <h6><i class="fas fa-calendar-alt me-2"></i>Período: ${data.noches} noche(s)</h6>
+        </div>
+        
+        <div class="mb-3">
+            <div class="alert alert-primary">
+                <i class="fas fa-calendar-week me-2"></i>
+                <strong>Temporada:</strong> ${data.temporada.nombre}
+                <br><small>Modificador: ${((data.temporada.modificador - 1) * 100).toFixed(0)}%</small>
+            </div>
+        </div>
+        
+        ${promocionHtml}
+        
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <tbody>
+                    <tr>
+                        <td>Precio Base por Noche:</td>
+                        <td class="text-end">$${data.precio_base.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>Precio con Temporada:</td>
+                        <td class="text-end">$${data.precio_con_temporada.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precio Final por Noche:</strong></td>
+                        <td class="text-end"><strong>$${data.precio_por_noche.toFixed(2)}</strong></td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td><strong>Total (${data.noches} noches):</strong></td>
+                        <td class="text-end"><strong>$${data.precio_total.toFixed(2)}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="d-grid">
+            <a href="/reservas/crear?habitacion_id=${data.habitacion_id}" class="btn btn-success">
+                <i class="fas fa-calendar-check me-2"></i>Realizar Reserva
+            </a>
+        </div>
+    `;
+}
+
+function mostrarError(mensaje) {
+    document.getElementById('resultados').innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${mensaje}
+        </div>
+    `;
+}
+</script>
+{% endblock %}

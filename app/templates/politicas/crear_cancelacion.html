@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Política de Cancelación - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-ban me-2"></i>Nueva Política de Cancelación
+                    <small class="text-muted ms-2">{{ hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Nombre de la Política *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   placeholder="Ej: Cancelación Flexible, Sin Reembolso, etc."
+                                   required>
+                            <div class="form-text">Nombre descriptivo para identificar la política</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="penalidad" class="form-label">
+                                <i class="fas fa-dollar-sign me-1"></i>Penalidad (Monto Fijo)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="penalidad" 
+                                       name="penalidad" 
+                                       step="0.01" 
+                                       min="0"
+                                       placeholder="0.00">
+                            </div>
+                            <div class="form-text">Monto fijo a cobrar como penalidad</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dias_anticipacion_reembolso" class="form-label">
+                                <i class="fas fa-calendar-days me-1"></i>Días de Anticipación
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="dias_anticipacion_reembolso" 
+                                   name="dias_anticipacion_reembolso" 
+                                   min="0"
+                                   placeholder="0">
+                            <div class="form-text">Días mínimos antes del check-in para reembolso</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="descripcion" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Descripción
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descripcion" 
+                                      name="descripcion" 
+                                      rows="4"
+                                      placeholder="Describa los términos y condiciones de esta política de cancelación..."></textarea>
+                            <div class="form-text">Términos detallados de la política</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('politicas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Crear Política
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ejemplos de Políticas Comunes -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Ejemplos de Políticas Comunes
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-success">Cancelación Gratuita</h6>
+                        <ul class="small">
+                            <li>Penalidad: $0</li>
+                            <li>Días: 2 días antes</li>
+                            <li>Reembolso completo</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-warning">Cancelación Moderada</h6>
+                        <ul class="small">
+                            <li>Penalidad: $50</li>
+                            <li>Días: 1 día antes</li>
+                            <li>Cargo por gestión</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Sin Reembolso</h6>
+                        <ul class="small">
+                            <li>Penalidad: 100% del total</li>
+                            <li>Días: 0 días</li>
+                            <li>No reembolsable</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

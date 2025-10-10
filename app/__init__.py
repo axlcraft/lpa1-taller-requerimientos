@@ -26,8 +26,33 @@ def create_app(config_name=None):
     @flask_app.context_processor
     def inject_global_vars():
         return {
-            'app_name': 'Sistema de Reservas Hoteleras'
+            'app_name': 'LuxeStay Premier',
+            'app_tagline': 'Experiencias Hoteleras de Lujo'
         }
+
+    # Filtro personalizado para fechas en español
+    @flask_app.template_filter('fecha_es')
+    def fecha_es(date, format_str='%d de %B de %Y'):
+        """Formatea una fecha con nombres de mes en español."""
+        if not date:
+            return ''
+        
+        # Diccionario de meses en español
+        meses_es = {
+            'January': 'enero', 'February': 'febrero', 'March': 'marzo',
+            'April': 'abril', 'May': 'mayo', 'June': 'junio',
+            'July': 'julio', 'August': 'agosto', 'September': 'septiembre',
+            'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'
+        }
+        
+        # Formatear la fecha primero en inglés
+        fecha_str = date.strftime(format_str)
+        
+        # Reemplazar nombres de mes en inglés por español
+        for mes_en, mes_es in meses_es.items():
+            fecha_str = fecha_str.replace(mes_en, mes_es)
+        
+        return fecha_str
 
     # Registrar blueprints
     try:
@@ -77,6 +102,24 @@ def create_app(config_name=None):
         flask_app.register_blueprint(evaluaciones_bp, url_prefix='/evaluaciones')
     except ImportError as e:
         print(f"Warning: Could not import evaluaciones blueprint: {e}")
+
+    try:
+        from app.routes.promociones import promociones_bp
+        flask_app.register_blueprint(promociones_bp, url_prefix='/promociones')
+    except ImportError as e:
+        print(f"Warning: Could not import promociones blueprint: {e}")
+
+    try:
+        from app.routes.politicas import politicas_bp
+        flask_app.register_blueprint(politicas_bp, url_prefix='/politicas')
+    except ImportError as e:
+        print(f"Warning: Could not import politicas blueprint: {e}")
+
+    try:
+        from app.routes.temporadas import temporadas_bp
+        flask_app.register_blueprint(temporadas_bp, url_prefix='/temporadas')
+    except ImportError as e:
+        print(f"Warning: Could not import temporadas blueprint: {e}")
 
     # Crear tablas
     with flask_app.app_context():

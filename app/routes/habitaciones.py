@@ -28,6 +28,7 @@ def crear():
                 descripcion=request.form.get('descripcion'),
                 precio_base=float(request.form['precio_base']),
                 capacidad=int(request.form['capacidad']),
+                servicios_incluidos=request.form.get('servicios_incluidos'),
                 estado=EstadoHabitacion.ACTIVA,
                 hotel_id=request.form['hotel_id']
             )

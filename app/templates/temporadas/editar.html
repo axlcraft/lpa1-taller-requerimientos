@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Temporada - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Temporada
+                    <small class="text-muted ms-2">{{ temporada.hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Nombre de la Temporada *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   value="{{ temporada.nombre }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="tipo" class="form-label">
+                                <i class="fas fa-thermometer-half me-1"></i>Tipo de Temporada *
+                            </label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                {% for tipo in tipos_temporada %}
+                                <option value="{{ tipo.name }}" 
+                                        {% if temporada.tipo == tipo %}selected{% endif %}>
+                                    {{ tipo.value }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="fecha_inicio" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Fecha de Inicio *
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fecha_inicio" 
+                                   name="fecha_inicio" 
+                                   value="{{ temporada.fecha_inicio.strftime('%Y-%m-%d') }}"
+                                   required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="fecha_fin" class="form-label">
+                                <i class="fas fa-calendar-check me-1"></i>Fecha de Fin *
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fecha_fin" 
+                                   name="fecha_fin" 
+                                   value="{{ temporada.fecha_fin.strftime('%Y-%m-%d') }}"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('temporadas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Actualizar Temporada
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validar que la fecha de fin sea posterior a la de inicio
+document.getElementById('fecha_inicio').addEventListener('change', function() {
+    document.getElementById('fecha_fin').min = this.value;
+});
+</script>
+{% endblock %}

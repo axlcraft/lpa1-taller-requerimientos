@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Política de Pago - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Política de Pago
+                    <small class="text-muted ms-2">{{ politica.hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="tipo" class="form-label">
+                                <i class="fas fa-tags me-1"></i>Tipo de Pago *
+                            </label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                {% for tipo_pago in tipos_pago %}
+                                <option value="{{ tipo_pago.name }}" 
+                                        {% if politica.tipo == tipo_pago %}selected{% endif %}>
+                                    {{ tipo_pago.value }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="descripcion" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Descripción
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descripcion" 
+                                      name="descripcion" 
+                                      rows="4">{{ politica.descripcion }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('politicas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Actualizar Política
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}{{ promocion.nombre }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-tag me-2"></i>{{ promocion.nombre }}
+                    <span class="badge bg-light text-success ms-2">-{{ promocion.descuento }}%</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Información de la promoción -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-calendar-alt me-2"></i>Período de Validez</h6>
+                        <p class="text-muted">
+                            <strong>Desde:</strong> {{ promocion.fecha_inicio | fecha_es }}<br>
+                            <strong>Hasta:</strong> {{ promocion.fecha_fin | fecha_es }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-percentage me-2"></i>Descuento</h6>
+                        <p class="text-success display-6 fw-bold mb-0">{{ promocion.descuento }}%</p>
+                        <small class="text-muted">de descuento</small>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                {% if promocion.descripcion %}
+                <div class="mb-4">
+                    <h6><i class="fas fa-info-circle me-2"></i>Descripción</h6>
+                    <p class="text-muted">{{ promocion.descripcion }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Servicios adicionales -->
+                {% if promocion.servicios_adicionales %}
+                <div class="mb-4">
+                    <h6><i class="fas fa-concierge-bell me-2"></i>Servicios Adicionales Incluidos</h6>
+                    <div class="row">
+                        {% for servicio in promocion.servicios_as_list() %}
+                        <div class="col-md-6 mb-2">
+                            <span class="badge bg-info me-1">
+                                <i class="fas fa-check me-1"></i>{{ servicio }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Estado de la promoción -->
+                <div class="alert 
+                    {% if promocion.fecha_inicio <= today <= promocion.fecha_fin %}alert-success
+                    {% elif promocion.fecha_inicio > today %}alert-warning
+                    {% else %}alert-danger{% endif %} mb-4">
+                    <i class="fas fa-clock me-2"></i>
+                    {% if promocion.fecha_inicio <= today <= promocion.fecha_fin %}
+                        <strong>¡Promoción Activa!</strong> Válida hasta el {{ promocion.fecha_fin | fecha_es('%d de %B') }}
+                    {% elif promocion.fecha_inicio > today %}
+                        <strong>Próximamente</strong> - Válida desde el {{ promocion.fecha_inicio | fecha_es('%d de %B') }}
+                    {% else %}
+                        <strong>Promoción Expirada</strong> - Terminó el {{ promocion.fecha_fin | fecha_es('%d de %B') }}
+                    {% endif %}
+                </div>
+
+                <!-- Botón de Reservar Principal -->
+                {% if promocion.fecha_inicio <= today <= promocion.fecha_fin %}
+                <div class="text-center mb-4">
+                    <a href="{{ url_for('main.buscar') }}?ciudad={{ promocion.hotel.ubicacion_geografica }}&hotel_filter={{ promocion.hotel.id }}" 
+                       class="btn btn-success btn-lg px-5 py-3 shadow-lg">
+                        <i class="fas fa-calendar-check me-3"></i>
+                        <span class="fw-bold">¡RESERVAR AHORA CON {{ promocion.descuento }}% DESCUENTO!</span>
+                        <br>
+                        <small class="d-block mt-1 opacity-75">Aprovecha esta oferta especial</small>
+                    </a>
+                </div>
+                {% elif promocion.fecha_inicio > today %}
+                <div class="text-center mb-4">
+                    <button class="btn btn-outline-warning btn-lg px-5 py-3" disabled>
+                        <i class="fas fa-clock me-3"></i>
+                        <span class="fw-bold">PRÓXIMAMENTE - {{ promocion.descuento }}% DESCUENTO</span>
+                        <br>
+                        <small class="d-block mt-1">Disponible desde {{ promocion.fecha_inicio | fecha_es('%d de %B') }}</small>
+                    </button>
+                </div>
+                {% else %}
+                <div class="text-center mb-4">
+                    <button class="btn btn-outline-secondary btn-lg px-5 py-3" disabled>
+                        <i class="fas fa-ban me-3"></i>
+                        <span class="fw-bold">PROMOCIÓN EXPIRADA</span>
+                        <br>
+                        <small class="d-block mt-1">Terminó el {{ promocion.fecha_fin | fecha_es('%d de %B') }}</small>
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Botones de acción secundarios -->
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    {% if promocion.fecha_inicio <= today <= promocion.fecha_fin %}
+                    <a href="{{ url_for('main.buscar') }}?ciudad={{ promocion.hotel.ubicacion_geografica }}" 
+                       class="btn btn-outline-success">
+                        <i class="fas fa-search me-2"></i>Ver Todas las Habitaciones
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('hoteles.detalle', hotel_id=promocion.hotel.id) }}" 
+                       class="btn btn-outline-info">
+                        <i class="fas fa-hotel me-2"></i>Ver Hotel
+                    </a>
+
+                    {% if session.get('is_superuser') %}
+                    <a href="{{ url_for('promociones.editar', promocion_id=promocion.id) }}" 
+                       class="btn btn-outline-warning">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del hotel -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-hotel me-2"></i>Información del Hotel
+                </h6>
+            </div>
+            <div class="card-body">
+                <h5>{{ promocion.hotel.nombre }}</h5>
+                <p class="text-muted">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    {{ promocion.hotel.ubicacion_geografica }}
+                </p>
+                
+                {% if promocion.hotel.descripcion %}
+                <p class="small">{{ promocion.hotel.descripcion[:150] }}{% if promocion.hotel.descripcion|length > 150 %}...{% endif %}</p>
+                {% endif %}
+
+                <div class="mb-3">
+                    <small class="text-muted">Contacto:</small><br>
+                    {% if promocion.hotel.telefono %}
+                    <small><i class="fas fa-phone me-1"></i>{{ promocion.hotel.telefono }}</small><br>
+                    {% endif %}
+                    {% if promocion.hotel.correo %}
+                    <small><i class="fas fa-envelope me-1"></i>{{ promocion.hotel.correo }}</small>
+                    {% endif %}
+                </div>
+
+                <a href="{{ url_for('hoteles.detalle', hotel_id=promocion.hotel.id) }}" 
+                   class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-eye me-2"></i>Ver Detalles del Hotel
+                </a>
+            </div>
+        </div>
+
+        <!-- Reserva Rápida -->
+        {% if promocion.fecha_inicio <= today <= promocion.fecha_fin %}
+        <div class="card mt-3 border-success">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Reserva Rápida
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="badge bg-success fs-5 mb-2">
+                        -{{ promocion.descuento }}% DESCUENTO
+                    </div>
+                    <p class="small text-muted mb-3">Válido hasta {{ promocion.fecha_fin | fecha_es('%d de %B') }}</p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('main.buscar') }}?ciudad={{ promocion.hotel.ubicacion_geografica }}&hotel_filter={{ promocion.hotel.id }}" 
+                       class="btn btn-success">
+                        <i class="fas fa-search me-2"></i>Buscar Habitaciones
+                    </a>
+                    
+                    <a href="{{ url_for('habitaciones.listar') }}?hotel={{ promocion.hotel.id }}" 
+                       class="btn btn-outline-success">
+                        <i class="fas fa-bed me-2"></i>Ver Todas las Habitaciones
+                    </a>
+                </div>
+                
+                <hr class="my-3">
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        El descuento se aplicará automáticamente
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% elif promocion.fecha_inicio > today %}
+        <div class="card mt-3 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Próximamente
+                </h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="badge bg-warning text-dark fs-6 mb-2">
+                    -{{ promocion.descuento }}% DESCUENTO
+                </div>
+                <p class="small text-muted">
+                    Disponible desde<br>
+                    <strong>{{ promocion.fecha_inicio | fecha_es }}</strong>
+                </p>
+                <a href="{{ url_for('hoteles.detalle', hotel_id=promocion.hotel.id) }}" 
+                   class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-bell me-1"></i>Recibir Notificación
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Otras promociones del hotel -->
+        {% set otras_promociones = promocion.hotel.promociones|selectattr('id', '!=', promocion.id)|list %}
+        {% if otras_promociones %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-tags me-2"></i>Otras Ofertas de {{ promocion.hotel.nombre }}
+                </h6>
+            </div>
+            <div class="card-body">
+                {% for otra in otras_promociones[:3] %}
+                <div class="border-bottom pb-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="small">{{ otra.nombre }}</strong><br>
+                            <small class="text-muted">
+                                Hasta {{ otra.fecha_fin | fecha_es('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                        <span class="badge bg-success">-{{ otra.descuento }}%</span>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if otras_promociones|length > 3 %}
+                <small class="text-muted">
+                    Y {{ otras_promociones|length - 3 }} ofertas más...
+                </small>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botón de regreso -->
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{{ url_for('promociones.listar') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Promociones
+        </a>
+    </div>
+</div>
+{% endblock %}

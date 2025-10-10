@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Políticas - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-clipboard-list me-2"></i>Gestión de Políticas</h1>
+</div>
+
+<!-- Políticas por Hotel -->
+{% for hotel_id, datos in politicas_por_hotel.items() %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-hotel me-2"></i>{{ datos.hotel.nombre }}
+            <small class="text-light ms-2">{{ datos.hotel.ubicacion_geografica }}</small>
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Políticas de Cancelación -->
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6><i class="fas fa-ban me-2"></i>Políticas de Cancelación</h6>
+                    <a href="{{ url_for('politicas.crear_cancelacion', hotel_id=hotel_id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>Nueva
+                    </a>
+                </div>
+                
+                {% if datos.cancelacion %}
+                    <div class="list-group">
+                        {% for politica in datos.cancelacion %}
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">{{ politica.nombre }}</div>
+                                <small class="text-muted">{{ politica.descripcion[:100] }}{% if politica.descripcion|length > 100 %}...{% endif %}</small>
+                                <br>
+                                <small class="text-info">
+                                    <i class="fas fa-dollar-sign me-1"></i>Penalidad: ${{ "%.2f"|format(politica.penalidad) }}
+                                    <i class="fas fa-calendar-days ms-2 me-1"></i>{{ politica.dias_anticipacion_reembolso }} días
+                                </small>
+                            </div>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <a href="{{ url_for('politicas.editar_cancelacion', politica_id=politica.id) }}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="eliminarCancelacion('{{ politica.id }}')" 
+                                        class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-clipboard me-2"></i>No hay políticas de cancelación configuradas
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Políticas de Pago -->
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6><i class="fas fa-credit-card me-2"></i>Políticas de Pago</h6>
+                    <a href="{{ url_for('politicas.crear_pago', hotel_id=hotel_id) }}" 
+                       class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-plus me-1"></i>Nueva
+                    </a>
+                </div>
+                
+                {% if datos.pago %}
+                    <div class="list-group">
+                        {% for politica in datos.pago %}
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">
+                                    <i class="fas fa-credit-card me-1"></i>{{ politica.tipo.value }}
+                                </div>
+                                <small class="text-muted">{{ politica.descripcion[:100] }}{% if politica.descripcion|length > 100 %}...{% endif %}</small>
+                            </div>
+                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                <a href="{{ url_for('politicas.editar_pago', politica_id=politica.id) }}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="eliminarPago('{{ politica.id }}')" 
+                                        class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-credit-card me-2"></i>No hay políticas de pago configuradas
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-hotel fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">No hay hoteles registrados</h4>
+    <p class="text-muted">Primero debe registrar hoteles para configurar sus políticas.</p>
+    <a href="{{ url_for('hoteles.crear') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Registrar Hotel
+    </a>
+</div>
+{% endfor %}
+
+<!-- JavaScript para eliminar políticas -->
+<script>
+function eliminarCancelacion(politicaId) {
+    if (confirm('¿Está seguro de que desea eliminar esta política de cancelación?')) {
+        fetch(`/politicas/cancelacion/eliminar/${politicaId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+
+function eliminarPago(politicaId) {
+    if (confirm('¿Está seguro de que desea eliminar esta política de pago?')) {
+        fetch(`/politicas/pago/eliminar/${politicaId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

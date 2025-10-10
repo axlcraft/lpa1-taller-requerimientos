@@ -33,52 +33,92 @@ def index():
 
 @main_bp.route('/buscar')
 def buscar():
-    """Búsqueda de habitaciones con filtros y desplegable de ciudades."""
+    """Página de búsqueda de habitaciones con filtros avanzados"""
+    from app.models.enums import EstadoHotel, EstadoHabitacion
+    from sqlalchemy import and_
+    from datetime import datetime
+    
+    # Obtener todas las ciudades para el dropdown
+    ciudades = db.session.query(Hotel.ubicacion_geografica.distinct()).order_by(Hotel.ubicacion_geografica).all()
+    ciudades = [ciudad[0] for ciudad in ciudades if ciudad[0]]
+    
+    # Obtener parámetros de búsqueda avanzada
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
-    ciudad = request.args.get('ciudad', '')
-    ubicacion = request.args.get('ubicacion', '')
+    ciudad = request.args.get('ciudad')
+    capacidad = request.args.get('capacidad', type=int)
+    precio_min = request.args.get('precio_min', type=float)
     precio_max = request.args.get('precio_max', type=float)
-
-    # Obtener ciudades únicas con hoteles activos
-    from app.models.enums import EstadoHotel, EstadoHabitacion
-    ciudades = [h.ubicacion_geografica for h in Hotel.query.filter_by(estado=EstadoHotel.ACTIVO).distinct(Hotel.ubicacion_geografica).all()]
-
-    # Construir query base
-    query = db.session.query(Habitacion).join(Hotel)
-
-    # Filtrar por ciudad si se selecciona
+    tipo = request.args.get('tipo')
+    calificacion_min = request.args.get('calificacion_min', type=float)
+    servicios_seleccionados = request.args.getlist('servicios')
+    hotel_filter = request.args.get('hotel_filter')  # Nuevo filtro por hotel específico
+    
+    # Construir consulta base
+    query = db.session.query(Habitacion).join(Hotel).filter(
+        and_(
+            Habitacion.estado == EstadoHabitacion.ACTIVA,
+            Hotel.estado == EstadoHotel.ACTIVO
+        )
+    )
+    
+    # Aplicar filtros
     if ciudad:
         query = query.filter(Hotel.ubicacion_geografica == ciudad)
-
-    # Aplicar filtros
-    if ubicacion:
-        query = query.filter(
-            or_(
-                Hotel.nombre.contains(ubicacion),
-                Hotel.ubicacion_geografica.contains(ubicacion),
-                Hotel.direccion.contains(ubicacion)
-            )
-        )
-
-    if precio_max:
+    
+    if hotel_filter:
+        query = query.filter(Hotel.id == hotel_filter)
+    
+    if capacidad:
+        query = query.filter(Habitacion.capacidad >= capacidad)
+    
+    if precio_min is not None:
+        query = query.filter(Habitacion.precio_base >= precio_min)
+    
+    if precio_max is not None:
         query = query.filter(Habitacion.precio_base <= precio_max)
-
-    query = query.filter(
-        Habitacion.estado == EstadoHabitacion.ACTIVA,
-        Hotel.estado == EstadoHotel.ACTIVO
-    )
-
-    habitaciones = query.all()
-
+    
+    if tipo:
+        query = query.filter(Habitacion.tipo.ilike(f'%{tipo}%'))
+    
+    # Filtro de servicios incluidos
+    if servicios_seleccionados:
+        for servicio in servicios_seleccionados:
+            query = query.filter(Habitacion.servicios_incluidos.ilike(f'%{servicio}%'))
+    
+    # Ejecutar consulta
+    habitaciones = query.order_by(Habitacion.precio_base).all()
+    
+    # Calcular calificación promedio para cada habitación
+    habitaciones_con_calificacion = []
+    for hab in habitaciones:
+        calificaciones_vals = []
+        for c in hab.calificaciones:
+            val = getattr(c, 'estrellas_habitacion', None) or getattr(c, 'puntuacion', None)
+            if val is not None:
+                calificaciones_vals.append(val)
+        calificacion_promedio = sum(calificaciones_vals) / len(calificaciones_vals) if calificaciones_vals else 0
+        
+        # Filtro de calificación mínima
+        if calificacion_min is None or calificacion_promedio >= calificacion_min:
+            habitaciones_con_calificacion.append({
+                'habitacion': hab,
+                'calificacion_promedio': calificacion_promedio
+            })
+    
     return render_template('buscar.html', 
-                         habitaciones=habitaciones,
+                         habitaciones=habitaciones_con_calificacion,
+                         ciudades=ciudades,
                          fecha_inicio=fecha_inicio,
                          fecha_fin=fecha_fin,
                          ciudad=ciudad,
-                         ciudades=ciudades,
-                         ubicacion=ubicacion,
-                         precio_max=precio_max)
+                         capacidad=capacidad,
+                         precio_min=precio_min,
+                         precio_max=precio_max,
+                         tipo=tipo,
+                         calificacion_min=calificacion_min,
+                         servicios_seleccionados=servicios_seleccionados,
+                         hotel_filter=hotel_filter)
 
 @main_bp.route('/habitacion/<habitacion_id>')
 def detalle_habitacion(habitacion_id):

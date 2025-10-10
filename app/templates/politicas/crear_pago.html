@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Política de Pago - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card me-2"></i>Nueva Política de Pago
+                    <small class="text-muted ms-2">{{ hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="tipo" class="form-label">
+                                <i class="fas fa-tags me-1"></i>Tipo de Pago *
+                            </label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                <option value="">Seleccione un tipo de pago</option>
+                                {% for tipo_pago in tipos_pago %}
+                                <option value="{{ tipo_pago.name }}">{{ tipo_pago.value }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Método de pago aceptado por el hotel</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="descripcion" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Descripción
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descripcion" 
+                                      name="descripcion" 
+                                      rows="4"
+                                      placeholder="Describa los términos específicos de este método de pago..."></textarea>
+                            <div class="form-text">Términos y condiciones específicos para este método de pago</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('politicas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Crear Política
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información de Tipos de Pago -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Información de Tipos de Pago
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for tipo_pago in tipos_pago %}
+                    <div class="col-md-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h6 class="text-primary">{{ tipo_pago.value }}</h6>
+                            <small class="text-muted">
+                                {% if tipo_pago.name == 'TARJETA_CREDITO' %}
+                                    Pago con tarjeta de crédito al momento del check-in o reserva
+                                {% elif tipo_pago.name == 'TARJETA_DEBITO' %}
+                                    Pago con tarjeta de débito, descuento inmediato
+                                {% elif tipo_pago.name == 'EFECTIVO' %}
+                                    Pago en efectivo al momento del check-in
+                                {% elif tipo_pago.name == 'TRANSFERENCIA' %}
+                                    Transferencia bancaria antes de la estadía
+                                {% elif tipo_pago.name == 'PAYPAL' %}
+                                    Pago online a través de PayPal
+                                {% elif tipo_pago.name == 'CRIPTOMONEDAS' %}
+                                    Pago con monedas digitales (Bitcoin, Ethereum, etc.)
+                                {% else %}
+                                    Método de pago {{ tipo_pago.value }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

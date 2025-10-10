@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Temporada - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-plus me-2"></i>Nueva Temporada
+                    <small class="text-muted ms-2">{{ hotel.nombre }}</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nombre" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Nombre de la Temporada *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   placeholder="Ej: Verano 2024, Navidad y Año Nuevo, etc."
+                                   required>
+                            <div class="form-text">Nombre descriptivo para identificar la temporada</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="tipo" class="form-label">
+                                <i class="fas fa-thermometer-half me-1"></i>Tipo de Temporada *
+                            </label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                <option value="">Seleccione el tipo</option>
+                                {% for tipo in tipos_temporada %}
+                                <option value="{{ tipo.name }}">{{ tipo.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="fecha_inicio" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Fecha de Inicio *
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fecha_inicio" 
+                                   name="fecha_inicio" 
+                                   required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="fecha_fin" class="form-label">
+                                <i class="fas fa-calendar-check me-1"></i>Fecha de Fin *
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="fecha_fin" 
+                                   name="fecha_fin" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('temporadas.listar') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Crear Temporada
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información de Tipos de Temporada -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Modificadores de Precio por Tipo de Temporada
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for tipo in tipos_temporada %}
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3 text-center">
+                            <div class="mb-2">
+                                {% if tipo.name == 'ALTA' %}
+                                    <i class="fas fa-sun fa-2x text-danger"></i>
+                                {% elif tipo.name == 'MEDIA' %}
+                                    <i class="fas fa-leaf fa-2x text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-snowflake fa-2x text-success"></i>
+                                {% endif %}
+                            </div>
+                            <h6 class="
+                                {% if tipo.name == 'ALTA' %}text-danger
+                                {% elif tipo.name == 'MEDIA' %}text-warning
+                                {% else %}text-success{% endif %}
+                            ">{{ tipo.value }}</h6>
+                            <p class="small mb-0">
+                                {% if tipo.name == 'ALTA' %}
+                                    <strong>+50%</strong> sobre precio base<br>
+                                    <small class="text-muted">Período de máxima demanda</small>
+                                {% elif tipo.name == 'MEDIA' %}
+                                    <strong>+20%</strong> sobre precio base<br>
+                                    <small class="text-muted">Período de demanda moderada</small>
+                                {% else %}
+                                    <strong>-20%</strong> sobre precio base<br>
+                                    <small class="text-muted">Período de menor demanda</small>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validar que la fecha de fin sea posterior a la de inicio
+document.getElementById('fecha_inicio').addEventListener('change', function() {
+    document.getElementById('fecha_fin').min = this.value;
+});
+</script>
+{% endblock %}

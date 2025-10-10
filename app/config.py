@@ -28,13 +28,14 @@ class Config:
     SUPERUSER_PASSWORD = os.environ.get('SUPERUSER_PASSWORD', 'admin123')
 
 class DevelopmentConfig(Config):
-    """Configuración para desarrollo con MySQL."""
+    """Configuración para desarrollo con SQLite."""
     DEBUG = True
-    # Ejemplo de cadena de conexión MySQL:
+    # Usar SQLite por defecto para desarrollo local
+    # Para MySQL, configurar DEV_DATABASE_URL:
     # mysql+pymysql://usuario:contraseña@localhost/nombre_base
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEV_DATABASE_URL",
-        "mysql+pymysql://hoteluser:hotelpass@localhost/hotel_reservas"
+        "sqlite:///hotel_reservas.db"
     )
 
 class ProductionConfig(Config):

@@ -19,7 +19,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-hotel me-2"></i>{{ app_name }}
+                <i class="fas fa-crown me-2 text-warning"></i>
+                <span class="fw-bold">{{ app_name }}</span>
+                <small class="d-none d-md-inline text-light ms-2">{{ app_tagline }}</small>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -74,6 +76,75 @@
                             <i class="fas fa-calendar-check me-1"></i>Reservas
                         </a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="promocionDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-tags me-1"></i>Promociones
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('promociones.listar') }}">Ver Promociones</a></li>
+                            {% if session.get('is_superuser') %}
+                            <li><a class="dropdown-item" href="{{ url_for('promociones.crear') }}">Nueva Promoción</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% if session.get('is_superuser') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cogs me-1"></i>Administración
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('politicas.listar') }}">
+                                <i class="fas fa-clipboard-list me-2"></i>Políticas
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('temporadas.listar') }}">
+                                <i class="fas fa-calendar-alt me-2"></i>Temporadas
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- User Section -->
+                <ul class="navbar-nav ms-auto">
+                    {% if session.get('user_id') or session.get('is_superuser') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span class="fw-bold text-warning">
+                                {% if session.get('is_superuser') %}
+                                    <i class="fas fa-crown me-1 text-warning"></i>{{ session.get('user_name', 'Admin') }}
+                                {% else %}
+                                    {{ session.get('user_name', 'Usuario') }}
+                                {% endif %}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if not session.get('is_superuser') %}
+                            <li><a class="dropdown-item" href="{{ url_for('clientes.detalle', cliente_id=session.get('user_id')) }}">
+                                <i class="fas fa-user me-2"></i>Mi Perfil
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('reservas.listar') }}?cliente={{ session.get('user_id') }}">
+                                <i class="fas fa-calendar-check me-2"></i>Mis Reservas
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clientes.registrar') }}">
+                            <i class="fas fa-user-plus me-1"></i>Registrarse
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

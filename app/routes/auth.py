@@ -18,12 +18,29 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        
+        # Primero verificar si es el superusuario del sistema
         if username == current_app.config['SUPERUSER_USERNAME'] and password == current_app.config['SUPERUSER_PASSWORD']:
             session['is_superuser'] = True
+            session['user_id'] = 'admin'  # ID especial para admin
+            session['user_name'] = 'Administrador'
             flash('Ingreso exitoso como superusuario', 'success')
             return redirect(url_for('main.index'))
-        else:
-            flash('Credenciales inválidas', 'error')
+        
+        # Si no es admin, intentar login como cliente
+        from app.models import Cliente
+        cliente = Cliente.query.filter_by(username=username).first()
+        if cliente and cliente.check_password(password):
+            session['user_id'] = cliente.id
+            session['cliente_id'] = cliente.id
+            session['user_name'] = cliente.nombre_completo
+            # Respect the persistent is_admin flag on the Cliente model
+            session['is_superuser'] = bool(cliente.is_admin)
+            flash('Ingreso exitoso', 'success')
+            return redirect(url_for('main.index'))
+        
+        # Si ninguna de las dos opciones funciona
+        flash('Credenciales inválidas', 'error')
     return render_template('auth/login.html')
 
 
@@ -36,7 +53,9 @@ def login_client():
         password = request.form.get('password')
         cliente = Cliente.query.filter_by(username=username).first()
         if cliente and cliente.check_password(password):
+            session['user_id'] = cliente.id
             session['cliente_id'] = cliente.id
+            session['user_name'] = cliente.nombre_completo
             # Respect the persistent is_admin flag on the Cliente model
             session['is_superuser'] = bool(cliente.is_admin)
             flash('Ingreso exitoso', 'success')
@@ -69,7 +88,9 @@ def dev_login():
         db.session.commit()
 
     session['is_superuser'] = True
+    session['user_id'] = cliente.id
     session['cliente_id'] = cliente.id
+    session['user_name'] = cliente.nombre_completo
     flash('Logged in as dev superuser', 'success')
     return redirect(url_for('main.index'))
 
@@ -77,6 +98,8 @@ def dev_login():
 @auth_bp.route('/logout')
 def logout():
     session.pop('is_superuser', None)
+    session.pop('user_id', None)
     session.pop('cliente_id', None)
+    session.pop('user_name', None)
     flash('Sesión cerrada', 'info')
     return redirect(url_for('main.index'))

@@ -6,12 +6,21 @@
 <!-- Hero Section -->
 <div class="row mb-5">
     <div class="col-12">
-        <div class="jumbotron bg-primary text-white rounded p-5">
-            <h1 class="display-4"><i class="fas fa-hotel me-3"></i>Bienvenido al Sistema de Reservas Hoteleras</h1>
-            <p class="lead">Encuentra y reserva la habitación perfecta para tu próxima estadía. Explora nuestra amplia gama de hoteles y habitaciones disponibles.</p>
-            <a class="btn btn-light btn-lg" href="{{ url_for('main.buscar') }}">
-                <i class="fas fa-search me-2"></i>Buscar Habitaciones
-            </a>
+        <div class="jumbotron bg-gradient text-white rounded p-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="text-center">
+                <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                <h1 class="display-3 fw-bold mb-3">{{ app_name }}</h1>
+                <p class="display-6 mb-4">{{ app_tagline }}</p>
+                <p class="lead mb-4">Descubre experiencias hoteleras únicas con nuestro sistema de reservas premium. Hoteles de lujo, precios inteligentes y servicios excepcionales te esperan.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a class="btn btn-warning btn-lg px-4" href="{{ url_for('main.buscar') }}">
+                        <i class="fas fa-search me-2"></i>Explorar Hoteles
+                    </a>
+                    <a class="btn btn-outline-light btn-lg px-4" href="{{ url_for('promociones.listar') }}">
+                        <i class="fas fa-tags me-2"></i>Ver Ofertas
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

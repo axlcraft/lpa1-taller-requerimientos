@@ -1,17 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Detalle de Reserva</h2>
+    <!-- <h2>Detalle de Reserva</h2> -->
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Reserva #{{ reserva.id }}</h5>
+            <!-- <h5 class="card-title">Reserva #{{ reserva.id }}</h5> -->
+            <h5 class="card-title">Información de tu Reserva</h5>
             <p class="card-text">Cliente: {{ reserva.cliente.nombre_completo }}</p>
             <p class="card-text">Habitación: {{ reserva.habitacion.hotel.nombre }} - {{ reserva.habitacion.tipo.value|capitalize }}</p>
             <p class="card-text">Fecha de entrada: {{ reserva.fecha_inicio }}</p>
             <p class="card-text">Fecha de salida: {{ reserva.fecha_fin }}</p>
             <p class="card-text">Cantidad de personas: {{ reserva.cantidad_personas }}</p>
             <p class="card-text">Total: ${{ reserva.total }}</p>
-            <p class="card-text">Estado: {{ reserva.estado.value|capitalize }}</p>
+            <p class="card-text">Estado: 
+                {% if reserva.estado.name == 'PENDIENTE' %}
+                    <span class="badge bg-warning text-dark">{{ reserva.estado.value|capitalize }}</span>
+                {% elif reserva.estado.name == 'CONFIRMADA' %}
+                    <span class="badge bg-success">{{ reserva.estado.value|capitalize }}</span>
+                {% elif reserva.estado.name == 'CANCELADA' %}
+                    <span class="badge bg-danger">{{ reserva.estado.value|capitalize }}</span>
+                {% elif reserva.estado.name == 'COMPLETADA' %}
+                    <span class="badge bg-info">{{ reserva.estado.value|capitalize }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ reserva.estado.value|capitalize }}</span>
+                {% endif %}
+            </p>
+        </div>
+        
+        <!-- Botones de acción para la reserva -->
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="mb-3">Acciones disponibles:</h6>
+                </div>
+            </div>
+            <div class="row">
+                {% if reserva.estado.name == 'PENDIENTE' %}
+                <div class="col-md-6 mb-2">
+                    <a href="{{ url_for('pagos.pagar_reserva', reserva_id=reserva.id) }}" class="btn btn-success w-100">
+                        <i class="fas fa-credit-card me-2"></i>Pagar Reserva
+                    </a>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <form method="POST" action="{{ url_for('reservas.cancelar', reserva_id=reserva.id) }}" class="d-inline w-100" 
+                          onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta reserva? Esta acción no se puede deshacer.')">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-times me-2"></i>Cancelar Reserva
+                        </button>
+                    </form>
+                </div>
+                {% elif reserva.estado.name == 'CONFIRMADA' %}
+                <div class="col-md-6 mb-2">
+                    <button class="btn btn-success w-100" disabled>
+                        <i class="fas fa-check me-2"></i>Reserva Confirmada y Pagada
+                    </button>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <form method="POST" action="{{ url_for('reservas.cancelar', reserva_id=reserva.id) }}" class="d-inline w-100" 
+                          onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta reserva pagada? Se aplicarán las políticas de cancelación.')">
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Cancelar Reserva Pagada
+                        </button>
+                    </form>
+                </div>
+                {% elif reserva.estado.name == 'CANCELADA' %}
+                <div class="col-md-12 mb-2">
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="fas fa-ban me-2"></i>Reserva Cancelada
+                    </button>
+                </div>
+                {% elif reserva.estado.name == 'COMPLETADA' %}
+                <div class="col-md-12 mb-2">
+                    <button class="btn btn-info w-100" disabled>
+                        <i class="fas fa-flag-checkered me-2"></i>Reserva Completada
+                    </button>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
     <a href="{{ url_for('reservas.listar') }}" class="btn btn-secondary mt-3">Volver al listado</a>

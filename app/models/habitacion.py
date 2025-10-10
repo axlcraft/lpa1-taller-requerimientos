@@ -15,6 +15,7 @@ class Habitacion(BaseModel):
     descripcion = db.Column(db.Text)
     precio_base = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     capacidad = db.Column(db.Integer, nullable=False, default=1)
+    servicios_incluidos = db.Column(db.Text)  # Lista de servicios incluidos separados por comas
     estado = db.Column(db.Enum(EstadoHabitacion), default=EstadoHabitacion.ACTIVA, nullable=False)
 
     hotel_id = db.Column(db.String(36), db.ForeignKey("hoteles.id"), nullable=False)

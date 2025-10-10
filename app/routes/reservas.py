@@ -9,8 +9,19 @@ reservas_bp = Blueprint('reservas', __name__)
 
 @reservas_bp.route('/listar')
 def listar():
-    """Lista todas las reservas."""
-    reservas = Reserva.query.join(Cliente).join(Habitacion).all()
+    """Lista las reservas. Los usuarios normales solo ven sus propias reservas, los superusuarios ven todas."""
+    # Si es superusuario, puede ver todas las reservas
+    if session.get('is_superuser'):
+        reservas = Reserva.query.join(Cliente).join(Habitacion).all()
+    else:
+        # Si es un cliente normal, solo ve sus propias reservas
+        cliente_id = session.get('cliente_id')
+        if not cliente_id:
+            flash('Debes iniciar sesión para ver las reservas.', 'error')
+            return redirect(url_for('auth.login'))
+        
+        reservas = Reserva.query.join(Cliente).join(Habitacion).filter(Cliente.id == cliente_id).all()
+    
     return render_template('reservas/listar.html', reservas=reservas)
 
 @reservas_bp.route('/crear', methods=['GET', 'POST'])
@@ -105,8 +116,16 @@ def crear():
 
 @reservas_bp.route('/<reserva_id>', methods=['GET'])
 def detalle(reserva_id):
-    """Detalle de una reserva específica."""
+    """Detalle de una reserva específica. Solo el propietario o superusuarios pueden verla."""
     reserva = Reserva.query.get_or_404(reserva_id)
+    
+    # Verificar permisos: solo el propietario de la reserva o superusuarios pueden verla
+    if not session.get('is_superuser'):
+        cliente_id = session.get('cliente_id')
+        if not cliente_id or reserva.cliente_id != cliente_id:
+            flash('No tienes permisos para ver esta reserva.', 'error')
+            return redirect(url_for('reservas.listar'))
+    
     # Todas las acciones de calificación deben realizarse desde el blueprint 'evaluaciones'
     # Este endpoint muestra la reserva y un botón hacia la ruta de evaluación cuando aplique.
     return render_template('reservas/detalle.html', reserva=reserva, current_date=date.today())
@@ -115,9 +134,17 @@ def detalle(reserva_id):
 
 @reservas_bp.route('/<reserva_id>/editar', methods=['GET', 'POST'])
 def editar(reserva_id):
-    """Editar una reserva existente."""
+    """Editar una reserva existente. Solo el propietario o superusuarios pueden editarla."""
     from app.models.enums import EstadoHotel, EstadoHabitacion
     reserva = Reserva.query.get_or_404(reserva_id)
+    
+    # Verificar permisos: solo el propietario de la reserva o superusuarios pueden editarla
+    if not session.get('is_superuser'):
+        cliente_id = session.get('cliente_id')
+        if not cliente_id or reserva.cliente_id != cliente_id:
+            flash('No tienes permisos para editar esta reserva.', 'error')
+            return redirect(url_for('reservas.listar'))
+    
     habitaciones = Habitacion.query.join(Habitacion.hotel).filter(Habitacion.estado==EstadoHabitacion.ACTIVA, Hotel.estado==EstadoHotel.ACTIVO).all()
     clientes = []
     if request.method == 'POST':
@@ -164,5 +191,42 @@ def completar(reserva_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error al completar reserva: {str(e)}', 'error')
+    
+    return redirect(url_for('reservas.detalle', reserva_id=reserva.id))
+
+@reservas_bp.route('/<reserva_id>/cancelar', methods=['POST'])
+def cancelar(reserva_id):
+    """Cancelar una reserva."""
+    reserva = Reserva.query.get_or_404(reserva_id)
+    
+    # Verificar que el cliente autenticado sea el dueño de la reserva (si no es admin)
+    if not session.get('is_superuser'):
+        cliente_id = session.get('cliente_id')
+        if not cliente_id or reserva.cliente_id != cliente_id:
+            flash('No tienes permisos para cancelar esta reserva', 'error')
+            return redirect(url_for('reservas.listar'))
+    
+    # Verificar que la reserva se pueda cancelar
+    if reserva.estado == EstadoReserva.CANCELADA:
+        flash('Esta reserva ya está cancelada', 'warning')
+        return redirect(url_for('reservas.detalle', reserva_id=reserva.id))
+    
+    if reserva.estado == EstadoReserva.COMPLETADA:
+        flash('No se puede cancelar una reserva completada', 'error')
+        return redirect(url_for('reservas.detalle', reserva_id=reserva.id))
+    
+    try:
+        estado_anterior = reserva.estado
+        reserva.estado = EstadoReserva.CANCELADA
+        db.session.commit()
+        
+        if estado_anterior == EstadoReserva.CONFIRMADA:
+            flash('Reserva cancelada. Se procesará el reembolso según las políticas de cancelación.', 'success')
+        else:
+            flash('Reserva cancelada exitosamente', 'success')
+    
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al cancelar reserva: {str(e)}', 'error')
     
     return redirect(url_for('reservas.detalle', reserva_id=reserva.id))

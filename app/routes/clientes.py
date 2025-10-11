@@ -31,7 +31,8 @@ def registrar():
                 telefono=request.form.get('telefono'),
                 correo=request.form['correo'],
                 direccion=request.form.get('direccion'),
-                username=request.form.get('username')
+                username=request.form.get('username'),
+                is_admin=False  # Los clientes auto-registrados NUNCA pueden ser admin
             )
             # Guardar contraseña
             cliente.set_password(request.form.get('password'))
@@ -47,6 +48,45 @@ def registrar():
             flash(f'Error al registrar cliente: {str(e)}', 'error')
     
     return render_template('clientes/registrar.html')
+
+@clientes_bp.route('/admin/crear', methods=['GET', 'POST'])
+@admin_required
+def crear_admin():
+    """Solo administradores pueden crear nuevos usuarios con permisos de administrador."""
+    if request.method == 'POST':
+        try:
+            # Validar que el email no exista
+            if Cliente.query.filter_by(correo=request.form['correo']).first():
+                flash('Ya existe un cliente con ese correo electrónico', 'error')
+                return render_template('clientes/crear_admin.html')
+            # Validar que el username no exista
+            if Cliente.query.filter_by(username=request.form['username']).first():
+                flash('El nombre de usuario ya está en uso', 'error')
+                return render_template('clientes/crear_admin.html')
+            
+            cliente = Cliente(
+                nombre_completo=request.form['nombre_completo'],
+                telefono=request.form.get('telefono'),
+                correo=request.form['correo'],
+                direccion=request.form.get('direccion'),
+                username=request.form.get('username'),
+                is_admin='is_admin' in request.form  # Solo admin puede establecer esto
+            )
+            # Guardar contraseña
+            cliente.set_password(request.form.get('password'))
+            
+            db.session.add(cliente)
+            db.session.commit()
+            
+            tipo_usuario = 'administrador' if cliente.is_admin else 'cliente'
+            flash(f'{tipo_usuario.title()} creado exitosamente', 'success')
+            return redirect(url_for('clientes.listar'))
+        
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al crear usuario: {str(e)}', 'error')
+    
+    return render_template('clientes/crear_admin.html')
 
 @clientes_bp.route('/<cliente_id>')
 def detalle(cliente_id):
@@ -72,6 +112,12 @@ def editar(cliente_id):
             cliente.telefono = request.form.get('telefono')
             cliente.correo = request.form['correo']
             cliente.direccion = request.form.get('direccion')
+            
+            # Solo los administradores pueden cambiar permisos de administrador
+            from flask import session
+            if session.get('is_superuser'):
+                # Si el checkbox está marcado, será 'on', si no estará ausente
+                cliente.is_admin = 'is_admin' in request.form
             
             db.session.commit()
             flash('Cliente actualizado exitosamente', 'success')

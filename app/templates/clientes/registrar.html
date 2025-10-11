@@ -30,6 +30,14 @@
         <button type="submit" class="btn btn-primary">Registrar</button>
     </form>
     <p class="mt-3">¿Ya tienes cuenta? <a href="{{ url_for('auth.login_client') }}">Inicia sesión como cliente</a></p>
-    <p class="text-muted small">Nota: solo el superusuario puede editar o eliminar clientes y hoteles desde la interfaz.</p>
+    
+    <div class="alert alert-info mt-3">
+        <h6><i class="fas fa-info-circle me-2"></i>Política de Registro</h6>
+        <ul class="mb-0">
+            <li>Los usuarios que se auto-registran serán <strong>clientes regulares</strong></li>
+            <li>Solo los <strong>administradores existentes</strong> pueden crear cuentas con permisos de administrador</li>
+            <li>Si necesitas permisos de administrador, contacta a un administrador del sistema</li>
+        </ul>
+    </div>
 </div>
 {% endblock %}

